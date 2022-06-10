@@ -6,12 +6,25 @@ namespace StoryBlocks
 {
     public static class SBLib
     {
+        //Dictionary to hold all story blocks ([BLOCK NAME], [BLOCK DATA]).
         public static Dictionary<string, string> storyBlocks = new Dictionary<string, string>();
+        
+        //Dictionary to hold string variables ([VARIABLE NAME], ([VARIABLE VALUE], [VISIBILITY FLAG])).
         public static Dictionary<string, (string, bool)> stringDict = new Dictionary<string, (string, bool)>();
+
+        //Dictionary to hold integer variables ([VARIABLE NAME], ([VARIABLE VALUE], [VISIBILITY FLAG])).
         public static Dictionary<string, (int, bool)> intDict = new Dictionary<string, (int, bool)>();
+        
+        //Dictionary to hold inventory items ([ITEM NAME], [QUANTITY]).
         public static Dictionary<string, int> inventory = new Dictionary<string, int>();
+        
+        //List that stores the order of visited blocks, used for the "BACK" block loading argument ([BLOCK NAME]).
         public static List<string> blockHistory = new List<string>();
+        
+        //boolean flag to determine if the current line falls within a block.
         static bool blockStarted;
+
+        //default values for string variables.
         static string blockName = "";
         static string blockData = "";
         public static string title = "Untitled Story";
@@ -22,6 +35,8 @@ namespace StoryBlocks
         {
         }
 
+        //steps through the story file line by line to determine where each block is and what it contains.
+        //filePath: file path of story file
         public static void CreateBlocks(string filePath)
         {
             loadedStory = filePath;
@@ -53,6 +68,7 @@ namespace StoryBlocks
             reader.Close();
         }
 
+        //clears dictionaries for variables, inventory, and block history.
         public static void ClearDicts()
         {
             stringDict.Clear();
@@ -61,6 +77,8 @@ namespace StoryBlocks
             blockHistory.Clear();
         }
 
+        //finds variable name in the dictionaries and toggles the visibility flag.
+        //name: name of variable to toggle
         public static void toggleVisibility(string name)
         {
             if (intDict.ContainsKey(name))
@@ -77,7 +95,7 @@ namespace StoryBlocks
                 }
             }
             
-            if (stringDict.ContainsKey(name))
+            else if (stringDict.ContainsKey(name))
             {
                 string value = stringDict[name].Item1;
 
@@ -92,6 +110,8 @@ namespace StoryBlocks
             }
         }
 
+        //Sets visibility flag of a variable to true (visible).
+        //name: name of variable to make visible
         public static void makeVisible(string name)
         {
             if (intDict.ContainsKey(name))
@@ -104,6 +124,8 @@ namespace StoryBlocks
             }
         }
 
+        //Sets visibility flag of a variable to false (hidden).
+        //name: name of variable to make hidden
         public static void makeHidden(string name)
         {
             if (intDict.ContainsKey(name))
@@ -116,11 +138,11 @@ namespace StoryBlocks
             }
         }
 
+        //Loads and parses the "CONFIG" block.
         public static void LoadConfig()
         {
             ClearDicts();
             inventory.Clear();
-            SBCH.clearConds();
             string[] configData = storyBlocks["CONFIG"].Split(new string[] { "\n" }, StringSplitOptions.None);
             foreach (string config in configData)
             {
@@ -128,6 +150,8 @@ namespace StoryBlocks
             }
         }
 
+        //Loads the specified block to the screen.
+        //BlockName: name of the block to load
         public static void LoadBlock(string BlockName)
         {
             Console.Clear();
@@ -135,6 +159,7 @@ namespace StoryBlocks
             SBM.CreateMenu(BlockName);
         }
 
+        //Loads the story block specified in the CONFIG block for the beginning of the story.
         public static void StartStory()
         {
             LoadBlock(startBlock);

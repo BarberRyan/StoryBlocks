@@ -10,6 +10,9 @@ namespace StoryBlocks
 		{
 		}
 
+		//Adds item to the inventory or adds to the quantity of that item.
+		//name: item name
+		//count: quantity to add
 		public static void InventoryAdd(string name, int count)
         {
 			if (SBL.inventory.ContainsKey(name))
@@ -21,22 +24,28 @@ namespace StoryBlocks
 				SBL.inventory.Add(name, count);
 			}
         }
+
+		//Removes item from the inventory or subtracts from the quantity of that item.
+		//name: item name
+		//count: quantity to subtract
 		public static void InventoryRemove(string name, int count)
         {
 			if (SBL.inventory.ContainsKey(name))
             {
-				int item = SBL.inventory[name];
-				if (item > count)
+				int qty = SBL.inventory[name];
+				if (qty > count)
                 {
-					SBL.inventory[name] = item - count;
+					SBL.inventory[name] = qty - count;
                 }
-				else if (item <= count)
+				else if (qty <= count)
                 {
 					SBL.inventory.Remove(name);
                 }
             }
         }
 	
+		//Returns item name and quantity from the inventory.
+		//name: name of item to check
 		public static (string, int) GetItemInfo(string name)
         {
 			if (SBL.inventory.ContainsKey(name))
@@ -46,6 +55,7 @@ namespace StoryBlocks
 			return (name, 0);
         } 
 
+		//draws the inventory box and items to go inside.
 		public static void DrawInventory()
         {
 			if (SBL.inventory.Count() > 0)

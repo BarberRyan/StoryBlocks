@@ -7,6 +7,8 @@ namespace StoryBlocks
 		static SBPrefixHandler()
 		{
 		}
+
+		//Array of prefix codes in string form to give an index
         static string[] PrefixList = 
 		{ 
 			"1:",
@@ -28,14 +30,15 @@ namespace StoryBlocks
 			"?>:",
 			"I+:",
 			"I-:",
-			"!I=:",
-			"XI=:",
+			"!=:",
+			"X=:",
 			">>:",
 			"!!:",
 			"XX:",
 			"!X:"
 		};
 
+		//enumerator to make remembering each prefix index easier
 		public enum EPrefix
 		{
 			startBlock,
@@ -64,6 +67,10 @@ namespace StoryBlocks
 			makeHidden,
 			toggleVisibility
 		}
+
+		//Takes in a line from the file, gets the prefix (from GetPrefix), and then returns the corresponding index number.
+		//If the prefix does not match any known prefixes, returns -1.
+		//line: line string provided by StreamReader.
 		public static int GetPrefixIndex(string line)
         {
 			string prefix = GetPrefix(line);
@@ -77,6 +84,8 @@ namespace StoryBlocks
             }
         }
 
+		//Takes in a line and returns its prefix.
+		//line: line string provided by StreamReader
 		public static string GetPrefix(string line)
         {
 			return line.Substring(0, line.IndexOf(':') + 1);

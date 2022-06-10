@@ -6,5 +6,8 @@ namespace StoryBlocks
 		public SBErrorHandler()
 		{
 		}
+
+		//unused for now.
+
 	}
 }

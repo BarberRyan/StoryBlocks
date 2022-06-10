@@ -13,6 +13,10 @@ namespace StoryBlocks
 		{
 		}
 
+		//takes input string from line reader, finds the prefix index (from StoryBlocksPrefixHandler.EPrefix),
+		//and provides logic for each prefix. Elements can be made larger to accommodate a larger number of arguments.
+		//line: string provided by StreamReader
+
 		public static void PrefixOperation(string Line)
         {
 			int PrefixIndex = SBPH.GetPrefixIndex(Line);
@@ -25,14 +29,18 @@ namespace StoryBlocks
 
 			switch (PrefixIndex)
 			{
+				//indicates first block to load, should be set in CONFIG block ("1:[BLOCK NAME]").
 				case (int)EPrefix.startBlock:
 					SBL.startBlock = Line.Substring(Line.IndexOf(':') + 1);
 					break;
 
+				//indicates the window title, should be set in CONFIG block ("T:[TITLE]").
 				case (int)EPrefix.title:
 					SBL.title = Elements[0];
 					break;
 
+				//builds the story (the text above a menu) for a menu. Each line starting with "S:" will be added.
+				//currently, a color argument will apply to the entire block ("S:[TEXT]").
 				case (int)EPrefix.story:
                     if(SBM.Menu.ContainsKey("S")){
 						if (Elements[1] != "")
@@ -50,10 +58,12 @@ namespace StoryBlocks
 					}
 					break;
 
+				//creates a menu choice that loads a new block (">:[BLOCK TO LOAD]").
 				case (int)EPrefix.loadBlock:
 						SBM.addMenuChoice(Elements[0], Elements[1], Elements[2], Elements[3]);
 					break;
 
+				//creates or updates an integer variable that appears in the status section of the screen ("!:[NAME]:[START VALUE]").
 				case (int)EPrefix.visibleInt:
 					if (!SBL.intDict.ContainsKey(Elements[0]))
 					{
@@ -65,6 +75,7 @@ namespace StoryBlocks
 					}
 					break;
 
+				//creates or updates an integer variable that does not appear in the status section of the screen ("XI:[NAME]:[START VALUE]")
 				case (int)EPrefix.hiddenInt:
 					if (!SBL.intDict.ContainsKey(Elements[0]))
 					{
@@ -76,22 +87,28 @@ namespace StoryBlocks
 					}
 					break;
 
+				//adds a specified integer value to specified integer variable ("+:[NAME]:[AMOUNT TO ADD]")
 				case (int)EPrefix.add:
                     SBL.intDict[Elements[0]] = (SBL.intDict[Elements[0]].Item1 + Int32.Parse(Elements[1]), SBL.intDict[Elements[0]].Item2);
 					break;
 
+				//subtracts a specified integer value from specified integer variable ("-:[NAME]:[AMOUNT TO SUBTRACT]").
 				case (int)EPrefix.subtract:
 					SBL.intDict[Elements[0]] = (SBL.intDict[Elements[0]].Item1 - Int32.Parse(Elements[1]), SBL.intDict[Elements[0]].Item2);
 					break;
 
+				//multiplies a specified integer value to specified integer variable ("*:").
 				case (int)EPrefix.multiply:
 					SBL.intDict[Elements[0]] = (SBL.intDict[Elements[0]].Item1 * Int32.Parse(Elements[1]), SBL.intDict[Elements[0]].Item2);
 					break;
 
+				//divides a specified integer variable by specified integer and ignores remainder ("/:").
 				case (int)EPrefix.divide:
 					SBL.intDict[Elements[0]] = ((SBL.intDict[Elements[0]].Item1 / Int32.Parse(Elements[1])), SBL.intDict[Elements[0]].Item2);
 					break;
 
+
+				//creates or updates a string variable that appears in the status section of the screen ("!S:").
 				case (int)EPrefix.visibleStr:
 					if (!SBL.stringDict.ContainsKey(Elements[0]))
 					{
@@ -103,6 +120,7 @@ namespace StoryBlocks
 					}
 					break;
 
+				//creates or updates a string variable that does not appear in the status section of the screen ("XS:").
 				case (int)EPrefix.hiddenStr:
 					if (!SBL.stringDict.ContainsKey(Elements[0]))
 					{
@@ -114,6 +132,7 @@ namespace StoryBlocks
 					}
 					break;
 
+				//tests if the specified integer variable is less than the specified integer value ("?<:[NAME]:[TEST VALUE]").
 				case (int)EPrefix.lessThan:
 					if (SBL.intDict[Elements[0]].Item1 < Int32.Parse(Elements[1]))
 					{
@@ -121,6 +140,7 @@ namespace StoryBlocks
 					}
 					break;
 
+				//tests if the specified integer variable is less than or equal to the specified integer value ("?<=:[NAME]:[TEST VALUE]").
 				case (int)EPrefix.lessOrEqual:
 					if (SBL.intDict[Elements[0]].Item1 <= Int32.Parse(Elements[1]))
 					{
@@ -128,6 +148,8 @@ namespace StoryBlocks
 					}
 					break;
 
+				//tests if the specified variable is equal to the specified value ("?=:[NAME]:[TEST VALUE]").
+				//Can be used on int or string variables.
 				case (int)EPrefix.equal:
 					if (SBL.intDict.ContainsKey(Elements[0]) && SBL.intDict[Elements[0]] == (Int32.Parse(Elements[1]), SBL.intDict[Elements[0]].Item2))
 					{
@@ -138,14 +160,14 @@ namespace StoryBlocks
 						SBM.addMenuChoice(command: Elements[2], text: Elements[3]);
 					}
 						break;
-
+				//tests if the specified integer variable is greater than the specified integer value ("?>:[NAME]:[TEST VALUE]").
 				case (int)EPrefix.greaterOrEqual:
 					if (SBL.intDict[Elements[0]].Item1 >= Int32.Parse(Elements[1]))
 					{
 						SBM.addMenuChoice(command: Elements[2], text: Elements[3]);
 					}
 					break;
-
+				//tests if the specified integer variable is greater than or equal to than the specified integer value ("?>=:[NAME]:[TEST VALUE]").
 				case (int)EPrefix.greaterThan:
 					if (SBL.intDict[Elements[0]].Item1 > Int32.Parse(Elements[1]))
 					{
@@ -153,13 +175,17 @@ namespace StoryBlocks
 					}
 					break;
 
+				//Adds an item to the inventory, or adds the specified quantity to the inventory ("I+:[NAME]:[QUANTITY]").
                 case (int)EPrefix.inventoryAdd:
                     SBIH.InventoryAdd(Elements[0], Int32.Parse(Elements[1]));
 					break;
+
+				//subtracts quantity of item from inventory or removes it if 0 are left ("I-:[NAME]:[QUANTITY]").
 				case (int)EPrefix.inventorySubtract:
                     SBIH.InventoryRemove(Elements[0], Int32.Parse(Elements[1]));
 					break;
 
+				//provides an input option for visible variables ("!=:[NAME]:[PROMPT]").
 				case (int)EPrefix.inputVisible:
 					Console.Clear();
 					Console.WriteLine(Elements[1]+"\n");
@@ -167,6 +193,7 @@ namespace StoryBlocks
 					SBM.goBack();
 					break;
 
+				//provides an input option for hidden variables ("X=:[NAME]:[PROMPT]").
 				case (int)EPrefix.inputHidden:
 					Console.Clear();
 					Console.WriteLine(Elements[1] + "\n");
@@ -174,6 +201,8 @@ namespace StoryBlocks
 					SBM.goBack();
 					break;
 
+				//immediately loads a new block when triggered (">>:[BLOCK TO LOAD]").
+				//Used for making blocks for item functions, changing stats, etc.
 				case (int)EPrefix.immediateJump:
                     if (Elements[0] == "BACK")
                     {
@@ -186,14 +215,17 @@ namespace StoryBlocks
 					
 					break;
 
+				//Makes a variable visible ("!!:[NAME]").
 				case (int)EPrefix.makeVisible:
 					SBL.makeVisible(Elements[0]);
 					break;
 
+				//Makes a variable hidden ("XX:[NAME]").
 				case (int)EPrefix.makeHidden:
 					SBL.makeHidden(Elements[0]);
 					break;
 
+				//Toggles variable visibility ("!X:[NAME]").
 				case (int)EPrefix.toggleVisibility:
 					SBL.toggleVisibility(Elements[0]);
 					break;
@@ -203,6 +235,11 @@ namespace StoryBlocks
 					
 			}
         }
+
+		//Handles manual user input.
+		//key: name of the variable to update/add
+		//visible: boolean value to set visibility (true = visible, false = hidden).
+		//If the input provided is able to be parsed as an integer, it is saved as an integer variable, otherwise it is a string.
 
 		public static void inputOperation(string key, bool visible)
         {

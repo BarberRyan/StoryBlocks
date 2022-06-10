@@ -8,7 +8,11 @@ namespace StoryBlocks
         {
             Console.CursorVisible = false;
 
-            string filePath = System.IO.Directory.GetCurrentDirectory() + "/Stories/FormatTest.txt";
+            //file path for default story file.
+
+            string filePath = System.IO.Directory.GetCurrentDirectory() + "/Stories/default.txt";
+
+            //get file path from command line arguments (or dragging a .txt file onto the .exe).
 
             if (args.Length != 0)
             {
@@ -17,6 +21,10 @@ namespace StoryBlocks
             }
             LoadStory(filePath);
         }
+
+        //Sets the story up, also reloads the file if currently running.
+        //story: file path of the story file to load
+
         public static void LoadStory(string story)
         {
             SBL.storyBlocks.Clear();
