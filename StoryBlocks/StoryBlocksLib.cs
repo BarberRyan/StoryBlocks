@@ -12,9 +12,9 @@ namespace StoryBlocks
         public static Dictionary<string, int> inventory = new Dictionary<string, int>();
         public static List<string> blockHistory = new List<string>();
         static bool blockStarted;
-        static string line = "";
         static string blockName = "";
         static string blockData = "";
+        public static string title = "Untitled Story";
         public static string startBlock = "";
         public static string loadedStory = "";
 

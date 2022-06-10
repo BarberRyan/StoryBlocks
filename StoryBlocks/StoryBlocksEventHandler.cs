@@ -12,22 +12,46 @@ namespace StoryBlocks
 		public SBEventHandler()
 		{
 		}
+
 		public static void PrefixOperation(string Line)
         {
 			int PrefixIndex = SBPH.GetPrefixIndex(Line);
-			string[] Elements = Line.Substring(Line.IndexOf(':') + 1).Split(new string[] {":"}, StringSplitOptions.RemoveEmptyEntries);
+			string[] lineData = Line.Substring(Line.IndexOf(':') + 1).Split(new string[] {":"}, StringSplitOptions.RemoveEmptyEntries);
+			string[] Elements = { "", "", "", "" };
+			for(int i = 0; i < lineData.Length; i++)
+            {
+				Elements[i] = lineData[i];
+            }
+
 			switch (PrefixIndex)
 			{
 				case (int)EPrefix.startBlock:
 					SBL.startBlock = Line.Substring(Line.IndexOf(':') + 1);
 					break;
 
+				case (int)EPrefix.title:
+					SBL.title = Elements[0];
+					break;
+
 				case (int)EPrefix.story:
-					SBM.Menu.Add("S", Elements[0]);
+                    if(SBM.Menu.ContainsKey("S")){
+						if (Elements[1] != "")
+						{
+							SBM.concatMenuChoice("S", Elements[0], Elements[1], Elements[2]);
+						}
+                        else
+                        {
+							SBM.concatMenuChoice("S", Elements[0]);
+                        }
+                    }
+                    else
+                    {
+						SBM.addMenuChoice("S", Elements[0], Elements[1], Elements[2]);
+					}
 					break;
 
 				case (int)EPrefix.loadBlock:
-					SBM.Menu.Add(Elements[0], Elements[1]);
+						SBM.addMenuChoice(Elements[0], Elements[1], Elements[2], Elements[3]);
 					break;
 
 				case (int)EPrefix.visibleInt:
@@ -93,39 +117,39 @@ namespace StoryBlocks
 				case (int)EPrefix.lessThan:
 					if (SBL.intDict[Elements[0]].Item1 < Int32.Parse(Elements[1]))
 					{
-						SBM.Menu.Add(Elements[2], Elements[3]);
+						SBM.addMenuChoice(command: Elements[2],text: Elements[3]);
 					}
 					break;
 
 				case (int)EPrefix.lessOrEqual:
 					if (SBL.intDict[Elements[0]].Item1 <= Int32.Parse(Elements[1]))
 					{
-						SBM.Menu.Add(Elements[2], Elements[3]);
+						SBM.addMenuChoice(command: Elements[2], text: Elements[3]);
 					}
 					break;
 
 				case (int)EPrefix.equal:
 					if (SBL.intDict.ContainsKey(Elements[0]) && SBL.intDict[Elements[0]] == (Int32.Parse(Elements[1]), SBL.intDict[Elements[0]].Item2))
 					{
-						SBM.Menu.Add(Elements[2], Elements[3]);
+						SBM.addMenuChoice(command: Elements[2], text: Elements[3]);
 					}
 					else if (SBL.stringDict.ContainsKey(Elements[0]) && SBL.stringDict[Elements[0]] == (Elements[1], SBL.stringDict[Elements[0]].Item2))
 					{
-						SBM.Menu.Add(Elements[2], Elements[3]);
+						SBM.addMenuChoice(command: Elements[2], text: Elements[3]);
 					}
 						break;
 
 				case (int)EPrefix.greaterOrEqual:
 					if (SBL.intDict[Elements[0]].Item1 >= Int32.Parse(Elements[1]))
 					{
-						SBM.Menu.Add(Elements[2], Elements[3]);
+						SBM.addMenuChoice(command: Elements[2], text: Elements[3]);
 					}
 					break;
 
 				case (int)EPrefix.greaterThan:
 					if (SBL.intDict[Elements[0]].Item1 > Int32.Parse(Elements[1]))
 					{
-						SBM.Menu.Add(Elements[2], Elements[3]);
+						SBM.addMenuChoice(command: Elements[2], text: Elements[3]);
 					}
 					break;
 
@@ -182,7 +206,7 @@ namespace StoryBlocks
 
 		public static void inputOperation(string key, bool visible)
         {
-			string? inputString = Console.ReadLine();
+            string? inputString = Console.ReadLine();
 			
 			if(inputString == null)
             {

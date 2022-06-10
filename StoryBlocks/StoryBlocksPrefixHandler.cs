@@ -10,6 +10,7 @@ namespace StoryBlocks
         static string[] PrefixList = 
 		{ 
 			"1:",
+			"T:",
 			"S:",
 			">:",
 			"!I:",
@@ -38,6 +39,7 @@ namespace StoryBlocks
 		public enum EPrefix
 		{
 			startBlock,
+			title,
 			story,
 			loadBlock,
 			visibleInt,

@@ -8,7 +8,7 @@ namespace StoryBlocks
         {
             Console.CursorVisible = false;
 
-            string filePath = "FormatTest.txt";
+            string filePath = System.IO.Directory.GetCurrentDirectory() + "/Stories/FormatTest.txt";
 
             if (args.Length != 0)
             {
@@ -23,7 +23,7 @@ namespace StoryBlocks
             SBL.ClearDicts();
             SBL.CreateBlocks(story);
             SBL.LoadConfig();
-            Console.Title = "Story Blocks: " + SBM.GetMenuStory("MAIN MENU");
+            Console.Title = "Story Blocks: " + SBL.title;
             SBM.CreateMenu("MAIN MENU");
         }
     }
