@@ -148,8 +148,9 @@ namespace StoryBlocks
 				Console.WriteLine("ERROR! Block by the name of \"" + BlockName + "\" does not exist!\nPress any button to return to the main menu.");
 				Console.ReadKey(true);
 				Console.ResetColor();
-				SBL.LoadBlock("MAIN MENU");
-            }
+				Console.Clear();
+				SB.LoadStory(SBL.loadedStory);
+			}
 			
 			//Loops through each line to find prefixes and act on them.
 			foreach (string menuItem in menuData)

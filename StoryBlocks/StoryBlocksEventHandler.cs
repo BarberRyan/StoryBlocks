@@ -21,7 +21,7 @@ namespace StoryBlocks
         {
 			int PrefixIndex = SBPH.GetPrefixIndex(Line);
 			string[] lineData = Line.Substring(Line.IndexOf(':') + 1).Split(new string[] {":"}, StringSplitOptions.RemoveEmptyEntries);
-			string[] Elements = { "", "", "", "" };
+			string[] Elements = { "", "", "", "", "", "" };
 			for(int i = 0; i < lineData.Length; i++)
             {
 				Elements[i] = lineData[i];
@@ -132,46 +132,59 @@ namespace StoryBlocks
 					}
 					break;
 
-				//tests if the specified integer variable is less than the specified integer value ("?<:[NAME]:[TEST VALUE]").
+				//tests if the specified integer variable is less than the specified integer value ("?<:[NAME]:[TEST VALUE]:[BLOCK TO LOAD]:[CHOICE TEXT]").
 				case (int)EPrefix.lessThan:
 					if (SBL.intDict[Elements[0]].Item1 < Int32.Parse(Elements[1]))
 					{
-						SBM.addMenuChoice(command: Elements[2],text: Elements[3]);
+						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
 					}
 					break;
 
-				//tests if the specified integer variable is less than or equal to the specified integer value ("?<=:[NAME]:[TEST VALUE]").
+				//tests if the specified integer variable is less than or equal to the specified integer value ("?<=:[NAME]:[TEST VALUE]:[BLOCK TO LOAD]:[CHOICE TEXT]").
 				case (int)EPrefix.lessOrEqual:
 					if (SBL.intDict[Elements[0]].Item1 <= Int32.Parse(Elements[1]))
 					{
-						SBM.addMenuChoice(command: Elements[2], text: Elements[3]);
+						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
 					}
 					break;
 
-				//tests if the specified variable is equal to the specified value ("?=:[NAME]:[TEST VALUE]").
+				//tests if the specified variable is equal to the specified value ("?=:[NAME]:[TEST VALUE]:[BLOCK TO LOAD]:[CHOICE TEXT]").
 				//Can be used on int or string variables.
 				case (int)EPrefix.equal:
 					if (SBL.intDict.ContainsKey(Elements[0]) && SBL.intDict[Elements[0]] == (Int32.Parse(Elements[1]), SBL.intDict[Elements[0]].Item2))
 					{
-						SBM.addMenuChoice(command: Elements[2], text: Elements[3]);
+						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
 					}
 					else if (SBL.stringDict.ContainsKey(Elements[0]) && SBL.stringDict[Elements[0]] == (Elements[1], SBL.stringDict[Elements[0]].Item2))
 					{
-						SBM.addMenuChoice(command: Elements[2], text: Elements[3]);
+						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
 					}
 						break;
-				//tests if the specified integer variable is greater than the specified integer value ("?>:[NAME]:[TEST VALUE]").
+				//tests if the specified variable is NOT equal to the specified value ("?!=:[NAME]:[TEST VALUE]:[BLOCK TO LOAD]:[CHOICE TEXT]").
+				//Can be used on int or string variables.
+				case (int)EPrefix.notEqual:
+					if (SBL.intDict.ContainsKey(Elements[0]) && SBL.intDict[Elements[0]] != (Int32.Parse(Elements[1]), SBL.intDict[Elements[0]].Item2))
+					{
+						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
+					}
+					else if (SBL.stringDict.ContainsKey(Elements[0]) && SBL.stringDict[Elements[0]] != (Elements[1], SBL.stringDict[Elements[0]].Item2))
+					{
+						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
+					}
+					break;
+
+				//tests if the specified integer variable is greater than the specified integer value ("?>:[NAME]:[TEST VALUE]:[BLOCK TO LOAD]:[CHOICE TEXT]").
 				case (int)EPrefix.greaterOrEqual:
 					if (SBL.intDict[Elements[0]].Item1 >= Int32.Parse(Elements[1]))
 					{
-						SBM.addMenuChoice(command: Elements[2], text: Elements[3]);
+						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
 					}
 					break;
-				//tests if the specified integer variable is greater than or equal to than the specified integer value ("?>=:[NAME]:[TEST VALUE]").
+				//tests if the specified integer variable is greater than or equal to than the specified integer value ("?>=:[NAME]:[TEST VALUE]:[BLOCK TO LOAD]:[CHOICE TEXT]").
 				case (int)EPrefix.greaterThan:
 					if (SBL.intDict[Elements[0]].Item1 > Int32.Parse(Elements[1]))
 					{
-						SBM.addMenuChoice(command: Elements[2], text: Elements[3]);
+						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
 					}
 					break;
 
@@ -188,6 +201,8 @@ namespace StoryBlocks
 				//provides an input option for visible variables ("!=:[NAME]:[PROMPT]").
 				case (int)EPrefix.inputVisible:
 					Console.Clear();
+					Console.ForegroundColor = SBM.getColor(Elements[2], true);
+					Console.BackgroundColor = SBM.getColor(Elements[3], false);
 					Console.WriteLine(Elements[1]+"\n");
 					inputOperation(Elements[0], true);
 					SBM.goBack();
@@ -196,6 +211,8 @@ namespace StoryBlocks
 				//provides an input option for hidden variables ("X=:[NAME]:[PROMPT]").
 				case (int)EPrefix.inputHidden:
 					Console.Clear();
+					Console.ForegroundColor = SBM.getColor(Elements[2], true);
+					Console.BackgroundColor = SBM.getColor(Elements[3], false);
 					Console.WriteLine(Elements[1] + "\n");
 					inputOperation(Elements[0], false);
 					SBM.goBack();
