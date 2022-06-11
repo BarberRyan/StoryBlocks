@@ -1,6 +1,8 @@
 ﻿using System;
 using SBM = StoryBlocks.SBMenu;
 using SBCH = StoryBlocks.SBConditionalHandler;
+using SBERR = StoryBlocks.SBErrorHandler;
+using EErrorCode = StoryBlocks.SBErrorHandler.EErrorCode;
 using SBEH = StoryBlocks.SBEventHandler;
 namespace StoryBlocks
 {
@@ -55,6 +57,10 @@ namespace StoryBlocks
                     blockStarted = false;
                     storyBlocks.Add(blockName, blockData);
                     blockData = "";
+                }
+                else if (line.EndsWith("::") && line.IndexOf("::") > 0 && blockStarted)
+                {
+                    SBERR.ThrowError((int)EErrorCode.unfinishedBlock, blockName);
                 }
                 else
                 {

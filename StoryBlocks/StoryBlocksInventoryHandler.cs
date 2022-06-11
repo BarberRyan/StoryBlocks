@@ -66,15 +66,19 @@ namespace StoryBlocks
 				foreach (var item in SBL.inventory)
 				{
 					(string, int) thisItem = GetItemInfo(item.Key);
-					inventoryInfo += ("║    " + thisItem.Item1 + " : " + thisItem.Item2 + "    ");
+					inventoryInfo += ($"║ { thisItem.Item1} : {thisItem.Item2} ");
+					if(SBL.inventory.Last().Key == item.Key)
+                    {
+						inventoryInfo += "║";
+
+					}
 				}
 				if(inventoryInfo.Length < 11)
                 {
 					inventoryInfo = inventoryInfo.PadRight(13, ' ');
                 }
-				string topLine = "╠═══════════╩".PadRight(inventoryInfo.Length, '═') + "╗";
+				string topLine = "╠═══════════╩".PadRight(inventoryInfo.Length - 1, '═') + "╗";
 				var TL = new StringBuilder(topLine);
-
 				for (int i = 1; i < inventoryInfo.Length - 1; i++)
 				{
 					if (inventoryInfo[i] == '║')
@@ -93,9 +97,9 @@ namespace StoryBlocks
 				}
 
 				Console.WriteLine(TL.ToString());
-				Console.WriteLine(inventoryInfo + "║");
+				Console.WriteLine(inventoryInfo);
 
-				string bottomLine = "╚═".PadRight(inventoryInfo.Length, '═') + "╝";
+				string bottomLine = "╚".PadRight(inventoryInfo.Length - 1, '═') + "╝";
 				var BL = new StringBuilder(bottomLine);
 				
 				for(int i = 1; i < inventoryInfo.Length - 1; i++)

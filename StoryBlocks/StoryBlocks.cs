@@ -9,7 +9,7 @@ namespace StoryBlocks
         {
             Console.CursorVisible = false;
 
-            SBDS.generateDefaultStory();
+            SBDS.GenerateDefaultStory();
 
             string storyPath = System.IO.Directory.GetCurrentDirectory() + "/Stories/default.txt";
 
@@ -32,7 +32,7 @@ namespace StoryBlocks
             SBL.ClearDicts();
             SBL.CreateBlocks(story);
             SBL.LoadConfig();
-            Console.Title = "Story Blocks: " + SBL.title;
+            Console.Title = $"Story Blocks: {SBL.title}";
             SBM.CreateMenu("MAIN MENU");
         }
     }

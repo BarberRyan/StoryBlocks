@@ -20,8 +20,10 @@ namespace StoryBlocks
 		public static void PrefixOperation(string Line)
         {
 			int PrefixIndex = SBPH.GetPrefixIndex(Line);
+			string subPrefix = SBPH.GetSubPrefix(Line);
 			string[] lineData = Line.Substring(Line.IndexOf(':') + 1).Split(new string[] {":"}, StringSplitOptions.RemoveEmptyEntries);
-			string[] Elements = { "", "", "", "", "", "" };
+			string[] Elements = new string[20];
+			Array.Fill(Elements, "");
 			for(int i = 0; i < lineData.Length; i++)
             {
 				Elements[i] = lineData[i];
@@ -45,22 +47,22 @@ namespace StoryBlocks
                     if(SBM.Menu.ContainsKey("S")){
 						if (Elements[1] != "")
 						{
-							SBM.concatMenuChoice("S", Elements[0], Elements[1], Elements[2]);
+							SBM.concatMenuElement("S", Elements[0], Elements[1], Elements[2]);
 						}
                         else
                         {
-							SBM.concatMenuChoice("S", Elements[0]);
+							SBM.concatMenuElement("S", Elements[0]);
                         }
                     }
                     else
                     {
-						SBM.addMenuChoice("S", Elements[0], Elements[1], Elements[2]);
+						SBM.addMenuElement("S", Elements[0], Elements[1], Elements[2]);
 					}
 					break;
 
 				//creates a menu choice that loads a new block (">:[BLOCK TO LOAD]").
 				case (int)EPrefix.loadBlock:
-						SBM.addMenuChoice(Elements[0], Elements[1], Elements[2], Elements[3]);
+						SBM.addMenuElement(Elements[0], Elements[1], Elements[2], Elements[3]);
 					break;
 
 				//creates or updates an integer variable that appears in the status section of the screen ("!:[NAME]:[START VALUE]").
@@ -136,7 +138,11 @@ namespace StoryBlocks
 				case (int)EPrefix.lessThan:
 					if (SBL.intDict[Elements[0]].Item1 < Int32.Parse(Elements[1]))
 					{
-						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
+						PrefixOperation(SBPH.GetNextPrefix(Line));
+					}
+					else if (SBL.inventory.ContainsKey(Elements[0]) && SBL.inventory[Elements[0]] < Int32.Parse(Elements[1]))
+					{
+						PrefixOperation(SBPH.GetNextPrefix(Line));
 					}
 					break;
 
@@ -144,7 +150,11 @@ namespace StoryBlocks
 				case (int)EPrefix.lessOrEqual:
 					if (SBL.intDict[Elements[0]].Item1 <= Int32.Parse(Elements[1]))
 					{
-						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
+						PrefixOperation(SBPH.GetNextPrefix(Line));
+					}
+					else if (SBL.inventory.ContainsKey(Elements[0]) && SBL.inventory[Elements[0]] <= Int32.Parse(Elements[1]))
+					{
+						PrefixOperation(SBPH.GetNextPrefix(Line));
 					}
 					break;
 
@@ -153,38 +163,61 @@ namespace StoryBlocks
 				case (int)EPrefix.equal:
 					if (SBL.intDict.ContainsKey(Elements[0]) && SBL.intDict[Elements[0]] == (Int32.Parse(Elements[1]), SBL.intDict[Elements[0]].Item2))
 					{
-						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
+						PrefixOperation(SBPH.GetNextPrefix(Line));
 					}
 					else if (SBL.stringDict.ContainsKey(Elements[0]) && SBL.stringDict[Elements[0]] == (Elements[1], SBL.stringDict[Elements[0]].Item2))
 					{
-						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
+						PrefixOperation(SBPH.GetNextPrefix(Line));
 					}
-						break;
+					else if (SBL.inventory.ContainsKey(Elements[0]) && SBL.inventory[Elements[0]] == Int32.Parse(Elements[1]))
+					{
+						PrefixOperation(SBPH.GetNextPrefix(Line));
+					}
+					break;
 				//tests if the specified variable is NOT equal to the specified value ("?!=:[NAME]:[TEST VALUE]:[BLOCK TO LOAD]:[CHOICE TEXT]").
 				//Can be used on int or string variables.
 				case (int)EPrefix.notEqual:
 					if (SBL.intDict.ContainsKey(Elements[0]) && SBL.intDict[Elements[0]] != (Int32.Parse(Elements[1]), SBL.intDict[Elements[0]].Item2))
 					{
-						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
+						PrefixOperation(SBPH.GetNextPrefix(Line));
 					}
 					else if (SBL.stringDict.ContainsKey(Elements[0]) && SBL.stringDict[Elements[0]] != (Elements[1], SBL.stringDict[Elements[0]].Item2))
 					{
-						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
+						PrefixOperation(SBPH.GetNextPrefix(Line));
+					}
+					else if (SBL.inventory.ContainsKey(Elements[0]) && SBL.inventory[Elements[0]] != Int32.Parse(Elements[1]))
+					{
+						PrefixOperation(SBPH.GetNextPrefix(Line));
 					}
 					break;
 
 				//tests if the specified integer variable is greater than the specified integer value ("?>:[NAME]:[TEST VALUE]:[BLOCK TO LOAD]:[CHOICE TEXT]").
 				case (int)EPrefix.greaterOrEqual:
-					if (SBL.intDict[Elements[0]].Item1 >= Int32.Parse(Elements[1]))
-					{
-						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
-					}
+                    if (SBL.intDict.ContainsKey(Elements[0]))
+                    {
+						if (SBL.intDict[Elements[0]].Item1 >= Int32.Parse(Elements[1]))
+						{
+							PrefixOperation(SBPH.GetNextPrefix(Line));
+						}
+                    }
+					if (SBL.inventory.ContainsKey(Elements[0]))
+                    {
+						if (SBL.inventory[Elements[0]] >= Int32.Parse(Elements[1]))
+						{
+							PrefixOperation(SBPH.GetNextPrefix(Line));
+						}
+                    }
+					
 					break;
 				//tests if the specified integer variable is greater than or equal to than the specified integer value ("?>=:[NAME]:[TEST VALUE]:[BLOCK TO LOAD]:[CHOICE TEXT]").
 				case (int)EPrefix.greaterThan:
-					if (SBL.intDict[Elements[0]].Item1 > Int32.Parse(Elements[1]))
+					if (SBL.intDict.ContainsKey(Elements[0]) && SBL.intDict[Elements[0]].Item1 > Int32.Parse(Elements[1]))
 					{
-						SBM.addMenuChoice(Elements[2], Elements[3], Elements[4], Elements[5]);
+						PrefixOperation(SBPH.GetNextPrefix(Line));
+					}
+					else if (SBL.inventory.ContainsKey(Elements[0]) && SBL.inventory[Elements[0]] > Int32.Parse(Elements[1]))
+					{
+						PrefixOperation(SBPH.GetNextPrefix(Line));
 					}
 					break;
 
@@ -289,6 +322,49 @@ namespace StoryBlocks
 					SBL.stringDict.Add(key, (inputString, visible));
 				}
 			}
+        }
+
+		public static string replaceVariable(string input)
+        {
+			int startIndex;
+			string varName;
+			string newValue = "";
+			for(int i = 0; i < input.Length; i++)
+            {
+                if (input[i] == '@')
+                {
+					startIndex = i + 1;
+					for(int j = i + 1; j < input.Length; j++)
+                    {
+						if (input[j] == '@')
+                        {
+							newValue = "";
+							varName = input.Substring(startIndex, (j - startIndex));
+                            if (SBL.stringDict.ContainsKey(varName))
+							{
+								newValue = SBL.stringDict[varName].Item1;
+                            }
+							else if (SBL.intDict.ContainsKey(varName))
+							{
+								newValue = SBL.intDict[varName].Item1.ToString();
+							}
+							else if (SBL.inventory.ContainsKey(varName))
+                            {
+								newValue = SBL.inventory[varName].ToString();
+                            }
+                            else
+                            {
+								newValue = "null";
+                            }
+							i = j + 1;
+							string oldValue = "@" + varName + "@";
+							input = input.Replace(oldValue, newValue);
+							break;
+						}
+                    }
+                }
+            }
+			return input;
         }
 
 	}
