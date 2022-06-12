@@ -26,7 +26,7 @@ namespace StoryBlocks
 			Array.Fill(Elements, "");
 			for(int i = 0; i < lineData.Length; i++)
             {
-				Elements[i] = lineData[i];
+				Elements[i] = replaceVariable(lineData[i]);
             }
 
 			switch (PrefixIndex)
@@ -237,7 +237,7 @@ namespace StoryBlocks
 					Console.ForegroundColor = SBM.getColor(Elements[2], true);
 					Console.BackgroundColor = SBM.getColor(Elements[3], false);
 					Console.WriteLine(Elements[1]+"\n");
-					inputOperation(Elements[0], true);
+					InputOperation(Elements[0], true);
 					SBM.goBack();
 					break;
 
@@ -247,7 +247,7 @@ namespace StoryBlocks
 					Console.ForegroundColor = SBM.getColor(Elements[2], true);
 					Console.BackgroundColor = SBM.getColor(Elements[3], false);
 					Console.WriteLine(Elements[1] + "\n");
-					inputOperation(Elements[0], false);
+					InputOperation(Elements[0], false);
 					SBM.goBack();
 					break;
 
@@ -291,7 +291,7 @@ namespace StoryBlocks
 		//visible: boolean value to set visibility (true = visible, false = hidden).
 		//If the input provided is able to be parsed as an integer, it is saved as an integer variable, otherwise it is a string.
 
-		public static void inputOperation(string key, bool visible)
+		public static void InputOperation(string key, bool visible)
         {
             string? inputString = Console.ReadLine();
 			
@@ -328,7 +328,7 @@ namespace StoryBlocks
         {
 			int startIndex;
 			string varName;
-			string newValue = "";
+			string newValue;
 			for(int i = 0; i < input.Length; i++)
             {
                 if (input[i] == '@')
@@ -338,7 +338,6 @@ namespace StoryBlocks
                     {
 						if (input[j] == '@')
                         {
-							newValue = "";
 							varName = input.Substring(startIndex, (j - startIndex));
                             if (SBL.stringDict.ContainsKey(varName))
 							{

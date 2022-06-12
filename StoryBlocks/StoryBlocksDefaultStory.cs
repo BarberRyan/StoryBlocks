@@ -24,14 +24,15 @@ namespace StoryBlocks
 			}
 			using (StreamWriter writer = File.CreateText(defaultFilePath))
 			{
-				writer.WriteLine("CONFIG::\n" +
-									"1:Beginning\n" +
-									"T:Sample Story\n" +
-									"!I:Money:0\n" +
-									"XS:Name:player\n" +
-									"::\n");
-
-				writer.WriteLine("MAIN MENU::\n" +
+					writer.WriteLine("CONFIG::\n" +
+							 		 "1:Beginning\n" +
+									 "T:Sample Story\n" +
+									 "D:This is the description of the story\n" +
+									 "!I:Money:0\n" +
+									 "XS:Name:player\n" +
+									 "::\n");
+				
+					writer.WriteLine("MAIN MENU::\n" +
 									"S:░██████╗░█████╗░███╗░░░███╗██████╗░██╗░░░░░███████╗\n" +
 									"S:██╔════╝██╔══██╗████╗░████║██╔══██╗██║░░░░░██╔════╝\n" +
 									"S:╚█████╗░███████║██╔████╔██║██████╔╝██║░░░░░█████╗░░\n" +
@@ -41,7 +42,7 @@ namespace StoryBlocks
 									">:START:Start the story!\n" +
 									">:ABOUT:About this story!\n" +
 									">:RELOAD:Reload story file!\n" +
-									">:EXIT:Exit the program!\n" +
+									">:EXIT:Exit the story!\n" +
 									"::\n");
 
 				writer.WriteLine("ABOUT::\n" +

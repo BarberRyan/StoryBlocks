@@ -15,8 +15,9 @@ namespace StoryBlocks
 		//Dictionary to hold items for the menu ([BLOCK TO LOAD ON USE], ([ITEM NAME], [FOREGROUND COLOR], [BACKGROUND COLOR)).
 		public static Dictionary<string, (string, ConsoleColor, ConsoleColor)> Menu = new Dictionary<string, (string, ConsoleColor, ConsoleColor)>();
 		
-		//Initializing integer varaible for current menu selection.
+		//Initializing integer varaibles.
 		static int activeOption = 1;
+		static int fileCount;
 	
 		//Initializing string variables
 		static string menuName = "";
@@ -162,7 +163,7 @@ namespace StoryBlocks
             {
 				if(BlockName != "MAIN MENU" && BlockName != "ABOUT")
                 {
-					addMenuElement(command: "INVENTORY", text: "-Inventory-");
+					addMenuElement("INVENTORY", "-Inventory-");
 				}
             }
 
@@ -171,7 +172,15 @@ namespace StoryBlocks
 			//Block load command that exits the app.
 			if (menuCommand == "EXIT")
             {
-				Environment.Exit(0);
+				if(menuName == "MAIN MENU" && fileCount > 1)
+                {
+					FileMenu();
+				}
+				else if(menuName == "MAIN MENU" && fileCount == 1)
+                {
+					Environment.Exit(0);
+                }
+				
             }
 
 			//Block load command that starts the first block of the story.
@@ -231,6 +240,74 @@ namespace StoryBlocks
             }
 			
 			SBL.LoadBlock(lastBlock);
+		}
+
+		public static void FileMenu()
+		{
+			Console.Title = "StoryBlocks";
+			menuName = "FILE MENU";
+			Console.Clear();
+			Menu.Clear();
+			IEnumerable<string> files = System.IO.Directory.EnumerateFiles(System.IO.Directory.GetCurrentDirectory() + @"\Stories");
+			fileCount = files.Count();
+			if (fileCount > 1)
+			{
+				addMenuElement("S", "            ██╗     ███████╗██████╗\n" +
+									"            ╚██╗ ██╗██╔════╝██╔══██╗\n" +
+									"             ╚██╗╚═╝███████╗██████╔╝\n" +
+									"             ██╔╝██╗╚════██║██╔══██╗\n" +
+									"            ██╔╝ ╚═╝███████║██████╔╝\n" +
+									"            ╚═╝     ╚══════╝╚═════╝\n" +
+									"Welcome to StoryBlocks! Please choose a story to load!", "CYAN");
+
+
+				foreach (var item in files)
+				{
+					string name = "";
+					string? desc = "";
+					if (item.EndsWith(".txt"))
+                    {
+						name = item.Substring(item.IndexOf(@"Stories\") + 8).Replace(".txt", "");
+
+						if (name == "default")
+						{
+							continue;
+						}
+						desc = getDescription(item);
+						addMenuElement(name, $"{name} : {desc}");
+					}
+				}
+				addMenuElement("EXIT", "Exit the program", "RED");
+				
+				string storyName = RunMenu();
+				
+				if(storyName == "EXIT")
+                {
+					Environment.Exit(0);
+                }
+
+				SB.LoadStory(System.IO.Directory.GetCurrentDirectory() + @$"\Stories\{storyName}.txt");
+			}
+            else
+            {
+				SB.LoadStory(System.IO.Directory.GetCurrentDirectory() + @"\Stories\default.txt");
+            }
+		}
+
+		static string getDescription(string filePath)
+        {
+			string? line;
+			StreamReader reader = File.OpenText(filePath);
+			while((line = reader.ReadLine()) != null)
+            {
+                if (line.StartsWith("D:"))
+                {
+					reader.Close();
+					return line.Substring(2);
+                }
+            }
+			reader.Close();
+			return "DESCRIPTION NOT FOUND";
 		}
 
 		//Takes the data in the Menu dictionary and uses it to draw the current menu on the screen.
@@ -322,13 +399,21 @@ namespace StoryBlocks
 				}
 				else if (pressedKey == ConsoleKey.Escape)
                 {
-					if(menuName != "MAIN MENU")
+                    if(menuName == "MAIN MENU" && fileCount > 1)
                     {
-						SBL.LoadBlock("MAIN MENU");	
+						FileMenu();
+                    }
+					else if(menuName == "MAIN MENU" && fileCount == 1)
+					{
+						Environment.Exit(0);
+                    }
+					else if(menuName == "FILE MENU")
+                    {
+						Environment.Exit(0);
                     }
                     else
                     {
-						Environment.Exit(0);
+						SBL.LoadBlock("MAIN MENU");
                     }
                 }
 			} while (pressedKey != ConsoleKey.Enter);

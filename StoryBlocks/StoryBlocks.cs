@@ -14,13 +14,13 @@ namespace StoryBlocks
             string storyPath = System.IO.Directory.GetCurrentDirectory() + "/Stories/default.txt";
 
             //get file path from command line arguments (or dragging a .txt file onto the .exe).
-
             if (args.Length != 0)
             {
                 storyPath = args[0];
-
+                LoadStory(storyPath);
             }
-            LoadStory(storyPath);
+
+            SBM.FileMenu();
         }
 
         //Sets the story up, also reloads the file if currently running.
@@ -28,11 +28,12 @@ namespace StoryBlocks
 
         public static void LoadStory(string story)
         {
+            Console.Clear();
             SBL.storyBlocks.Clear();
             SBL.ClearDicts();
             SBL.CreateBlocks(story);
             SBL.LoadConfig();
-            Console.Title = $"Story Blocks: {SBL.title}";
+            Console.Title = $"StoryBlocks: {SBL.title}";
             SBM.CreateMenu("MAIN MENU");
         }
     }
