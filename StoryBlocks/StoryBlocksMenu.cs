@@ -8,12 +8,14 @@ using SBL = StoryBlocks.SBLib;
 using SBPH = StoryBlocks.SBPrefixHandler;
 using SBERR = StoryBlocks.SBErrorHandler;
 using EErrorCode = StoryBlocks.SBErrorHandler.EErrorCode;
+using SBTH = StoryBlocks.SBTextHandler;
+
 namespace StoryBlocks
 {
 	public static class SBMenu
 	{
-		//Dictionary to hold items for the menu ([BLOCK TO LOAD ON USE], ([ITEM NAME], [FOREGROUND COLOR], [BACKGROUND COLOR)).
-		public static Dictionary<string, (string, ConsoleColor, ConsoleColor)> Menu = new Dictionary<string, (string, ConsoleColor, ConsoleColor)>();
+		//Dictionary to hold items for the menu ([BLOCK TO LOAD ON USE], [DISPLAY TEXT]).
+		public static Dictionary<string, string> Menu = new();
 		
 		//Initializing integer varaibles.
 		static int activeOption = 1;
@@ -21,96 +23,23 @@ namespace StoryBlocks
 	
 		//Initializing string variables
 		static string menuName = "";
-		static string[] menuData = {""};
+		static List<string> menuData = new List<string>();
+
 		static SBMenu()
 		{
 		}
-		//Takes in a string and returns a corresponding ConsoleColor.
-		//input: string argument for color provided at the end of a line (":[COLOR NAME]")
-		//text: true = foreground color, false = background color.
-		public static ConsoleColor getColor(string input, bool text)
+		
+
+		public static void addMenuElement(string command, string text = "")
         {
-			switch (input.ToUpper())
+			if(command == "S" && Menu.ContainsKey("S"))
             {
-				case "BLACK":
-					return ConsoleColor.Black;
-
-				case "BLUE":
-					return ConsoleColor.Blue;
-
-				case "CYAN":
-				case "LIGHT BLUE":
-				case "LIGHTBLUE":
-					return ConsoleColor.Cyan;
-
-				case "DARK BLUE":
-				case "DARKBLUE":
-					return ConsoleColor.DarkBlue;
-
-				case "DARK CYAN":
-				case "DARKCYAN":
-					return ConsoleColor.DarkCyan;
-
-				case "DARK GREY":
-				case "DARKGREY":
-				case "DARK GRAY":
-				case "DARKGRAY":
-					return ConsoleColor.DarkGray;
-
-
-				case "DARK GREEN":
-				case "DARKGREEN":
-					return ConsoleColor.DarkGreen;
-
-				case "DARK MAGENTA":
-				case "DARKMAGENTA":
-				case "PURPLE":
-					return ConsoleColor.DarkMagenta;
-
-				case "DARK RED":
-				case "DARKRED":
-					return ConsoleColor.DarkRed;
-
-				case "DARK YELLOW":
-				case "DARKTYELLOW":
-				case "GOLD":
-					return ConsoleColor.DarkYellow;
-
-				case "GRAY":
-				case "GREY":
-					return ConsoleColor.Gray;
-
-				case "GREEN":
-					return ConsoleColor.Green;
-
-				case "MAGENTA":
-				case "PINK":
-					return ConsoleColor.Magenta;
-
-				case "RED":
-					return ConsoleColor.Red;
-
-				case "WHITE":
-					return ConsoleColor.White;
-
-				case "YELLOW":
-					return ConsoleColor.Yellow;
-
-				default:
-                    if (text)
-                    {
-						return ConsoleColor.White;
-                    }
-                    else
-                    {
-						return ConsoleColor.Black;
-                    }
-			}
-        }
-
-		public static void addMenuElement(string command, string text, string textColor = "WHITE", string bkgColor = "BLACK")
-        {
-			Menu.Add(command, (text, getColor(textColor, true), getColor(bkgColor, false)));
+				Menu["S"] = $"{Menu["S"]}\n{text}";
+            }
+            else
+            {
+				Menu.Add(command, text);
+            }
         }
 
 		//Adds a new line of text to a menu option (currently only used for "S:" lines).
@@ -118,7 +47,7 @@ namespace StoryBlocks
 		//text: Text to add to the option on a new line
 		public static void concatMenuElement(string command, string text)
         {
-            Menu[command] = (Menu[command].Item1 + "\n" + text, Menu[command].Item2, Menu[command].Item3);
+            Menu[command] = (Menu[command] + "\n" + text);
         }
 
 		//Adds a new line of text to a menu option and changes the color options (currently only used for "S:" lines).
@@ -128,7 +57,7 @@ namespace StoryBlocks
 		//bkgColo: ConsoleColor value for the background color
 		public static void concatMenuElement(string command, string text, string textColor, string bkgColor)
         {
-			Menu[command] = (Menu[command].Item1 + "\n" + text, getColor(textColor, true), getColor(bkgColor, false));
+			Menu[command] = (Menu[command] + "\n" + text);
 		}
 
 		
@@ -141,9 +70,9 @@ namespace StoryBlocks
 			
 			//Splits the block data into individual lines to be added to "menuData" for processing.
 			//If the block doesn't exist, show an error.
-            if (SBL.storyBlocks.ContainsKey(BlockName))
+            if (SBL.StoryBlocks.ContainsKey(BlockName))
             {
-				menuData = SBL.storyBlocks[BlockName].Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+				menuData = SBL.StoryBlocks[BlockName].Split("\n").ToList<string>();
 			}
             else
             {
@@ -159,7 +88,7 @@ namespace StoryBlocks
 
 			//Draws the inventory if there is anything in it, and if not on the main menu or about screens.
 			//inventory use functions are not implemented yet.
-			if(SBL.inventory.Count > 0)
+			if(SBL.Inventory.Count > 0)
             {
 				if(BlockName != "MAIN MENU" && BlockName != "ABOUT")
                 {
@@ -219,24 +148,24 @@ namespace StoryBlocks
 		//Finds the last block visited in blockHistory and goes to it, removing the current block from the history.
 		public static void goBack()
         {
-			int lastIndex = SBL.blockHistory.Count - 1;
+			int lastIndex = SBL.BlockHistory.Count - 1;
 			string lastBlock = "MAIN MENU";
 			if(lastIndex >= 1)
             {
-				lastBlock = SBL.blockHistory[lastIndex - 1];
+				lastBlock = SBL.BlockHistory[lastIndex - 1];
 			}
-			if(SBL.blockHistory.Count() > 0)
+			if(SBL.BlockHistory.Count() > 0)
             {
-				SBL.blockHistory.RemoveAt(lastIndex);
+				SBL.BlockHistory.RemoveAt(lastIndex);
 			}
 			
 			if(lastIndex >= 1)
             {
-				SBL.blockHistory.RemoveAt(lastIndex - 1);
+				SBL.BlockHistory.RemoveAt(lastIndex - 1);
 			}
             else
             {
-				SBL.blockHistory.Clear();
+				SBL.BlockHistory.Clear();
             }
 			
 			SBL.LoadBlock(lastBlock);
@@ -252,13 +181,13 @@ namespace StoryBlocks
 			fileCount = files.Count();
 			if (fileCount > 1)
 			{
-				addMenuElement("S", "            ██╗     ███████╗██████╗\n" +
-									"            ╚██╗ ██╗██╔════╝██╔══██╗\n" +
-									"             ╚██╗╚═╝███████╗██████╔╝\n" +
-									"             ██╔╝██╗╚════██║██╔══██╗\n" +
-									"            ██╔╝ ╚═╝███████║██████╔╝\n" +
-									"            ╚═╝     ╚══════╝╚═════╝\n" +
-									"Welcome to StoryBlocks! Please choose a story to load!", "CYAN");
+				addMenuElement("S", "            {██╗     ███████╗██████╗}[cyan]\n" +
+									"            {╚██╗ ██╗██╔════╝██╔══██╗}[cyan]\n" +
+									"            { ╚██╗╚═╝███████╗██████╔╝}[cyan]\n" +
+									"            { ██╔╝██╗╚════██║██╔══██╗}[cyan]\n" +
+									"            {██╔╝ ╚═╝███████║██████╔╝}[cyan]\n" +
+									"            {╚═╝     ╚══════╝╚═════╝}[cyan]\n" +
+									"Welcome to StoryBlocks! Please choose a story to load!");
 
 
 				foreach (var item in files)
@@ -277,13 +206,19 @@ namespace StoryBlocks
 						addMenuElement(name, $"{name} : {desc}");
 					}
 				}
-				addMenuElement("EXIT", "Exit the program", "RED");
+				addMenuElement("BLANK", "BLANK");
+				addMenuElement("RELOAD", "Reload the story list");
+				addMenuElement("EXIT", "Exit the program");
 				
 				string storyName = RunMenu();
 				
 				if(storyName == "EXIT")
                 {
 					Environment.Exit(0);
+                }
+				if(storyName == "RELOAD")
+                {
+					FileMenu();
                 }
 
 				SB.LoadStory(System.IO.Directory.GetCurrentDirectory() + @$"\Stories\{storyName}.txt");
@@ -316,45 +251,46 @@ namespace StoryBlocks
 			//Draw story (text at the top of the menu).
 			if (Menu.ContainsKey("S"))
 			{
-				Console.ForegroundColor = Menu["S"].Item2;
-				Console.BackgroundColor = Menu["S"].Item3;
-				Console.WriteLine(SBEH.replaceVariable(Menu["S"].Item1) + "\n\n");
 				Console.ResetColor();
+                SBTextHandler.PrintText(SBEH.replaceVariable(Menu["S"]) + "\n\n");
 			}
 			//iterates through each choice line to provide menu choices, and updates cursor position.
 			for (int i = 1; i < Menu.Count; i++)
 			{
-				Console.ForegroundColor = Menu.ElementAt(i).Value.Item2;
-				Console.BackgroundColor = Menu.ElementAt(i).Value.Item3;
+                if(Menu.ElementAt(i).Value == "BLANK")
+                {
+					Console.WriteLine();
+					continue;
+                }
 
 				if (activeOption == i)
 				{
-					Console.WriteLine(SBEH.replaceVariable($">> {Menu.ElementAt(i).Value.Item1} <<"));
+					SBTH.PrintText(SBEH.replaceVariable($">> {Menu.ElementAt(i).Value} <<"));
 				}
 				else
 				{
-					Console.WriteLine(SBEH.replaceVariable($"   {Menu.ElementAt(i).Value.Item1}   "));
+					SBTH.PrintText(SBEH.replaceVariable($"   {Menu.ElementAt(i).Value}   "));
 				}
 
 				Console.ResetColor();
 			}
 
 			//Prints visible variables to the screen.
-            if (!(menuName == "MAIN MENU") && !(menuName == "ABOUT"))
+			if (!(menuName == "MAIN MENU") && !(menuName == "ABOUT") && !(menuName == "FILE MENU"))
             {
 				Console.WriteLine("\n\n");
-				foreach (var item in SBL.stringDict)
+				foreach (var item in SBL.StringDict)
 				{
                     if (item.Value.Item2)
                     {
-						Console.WriteLine($"{item.Key}:{item.Value.Item1}");
+						SBTH.PrintText($"{item.Key}:{item.Value.Item1}");
 					}
 				}
-				foreach (var item in SBL.intDict)
+				foreach (var item in SBL.IntDict)
 				{
                     if (item.Value.Item2)
                     {
-						Console.WriteLine($"{item.Key}:{item.Value.Item1}");
+						SBTH.PrintText($"{item.Key}:{item.Value.Item1}");
 					}
 				}
 				//Draws the inventory screen at the bottom of the menu.
@@ -378,7 +314,11 @@ namespace StoryBlocks
                 {
 					if(activeOption < Menu.Count - 1)
                     {
-						activeOption += 1;
+						activeOption++;
+						while (Menu.ElementAt(activeOption).Value == "BLANK")
+                        {
+							activeOption++;
+                        }
 					}
 					else if (activeOption == Menu.Count - 1)
 					{
@@ -390,7 +330,11 @@ namespace StoryBlocks
 				{
 					if (activeOption > 1)
 					{
-						activeOption -= 1;
+						activeOption--;
+						while (Menu.ElementAt(activeOption).Value == "BLANK")
+						{
+							activeOption--;
+						}
 					}
 					else if (activeOption == 1)
                     {

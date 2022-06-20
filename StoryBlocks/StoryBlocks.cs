@@ -11,7 +11,7 @@ namespace StoryBlocks
 
             SBDS.GenerateDefaultStory();
 
-            string storyPath = System.IO.Directory.GetCurrentDirectory() + "/Stories/default.txt";
+            string storyPath = Directory.GetCurrentDirectory() + "/Stories/default.txt";
 
             //get file path from command line arguments (or dragging a .txt file onto the .exe).
             if (args.Length != 0)
@@ -29,7 +29,7 @@ namespace StoryBlocks
         public static void LoadStory(string story)
         {
             Console.Clear();
-            SBL.storyBlocks.Clear();
+            SBL.StoryBlocks.Clear();
             SBL.ClearDicts();
             SBL.CreateBlocks(story);
             SBL.LoadConfig();

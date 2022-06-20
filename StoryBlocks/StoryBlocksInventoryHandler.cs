@@ -15,13 +15,13 @@ namespace StoryBlocks
 		//count: quantity to add
 		public static void InventoryAdd(string name, int count)
         {
-			if (SBL.inventory.ContainsKey(name))
+			if (SBL.Inventory.ContainsKey(name))
             {
-                SBL.inventory[name] = SBL.inventory[name] + count;
+                SBL.Inventory[name] = SBL.Inventory[name] + count;
 			}
             else
             {
-				SBL.inventory.Add(name, count);
+				SBL.Inventory.Add(name, count);
 			}
         }
 
@@ -30,16 +30,16 @@ namespace StoryBlocks
 		//count: quantity to subtract
 		public static void InventoryRemove(string name, int count)
         {
-			if (SBL.inventory.ContainsKey(name))
+			if (SBL.Inventory.ContainsKey(name))
             {
-				int qty = SBL.inventory[name];
+				int qty = SBL.Inventory[name];
 				if (qty > count)
                 {
-					SBL.inventory[name] = qty - count;
+					SBL.Inventory[name] = qty - count;
                 }
 				else if (qty <= count)
                 {
-					SBL.inventory.Remove(name);
+					SBL.Inventory.Remove(name);
                 }
             }
         }
@@ -48,9 +48,9 @@ namespace StoryBlocks
 		//name: name of item to check
 		public static (string, int) GetItemInfo(string name)
         {
-			if (SBL.inventory.ContainsKey(name))
+			if (SBL.Inventory.ContainsKey(name))
             {
-				return (name, SBL.inventory[name]);
+				return (name, SBL.Inventory[name]);
             }
 			return (name, 0);
         } 
@@ -58,16 +58,16 @@ namespace StoryBlocks
 		//draws the inventory box and items to go inside.
 		public static void DrawInventory()
         {
-			if (SBL.inventory.Count() > 0)
+			if (SBL.Inventory.Count() > 0)
 			{
 				Console.WriteLine("╔═══════════╗");
 				Console.WriteLine("║ INVENTORY ║");
 				string inventoryInfo = "";
-				foreach (var item in SBL.inventory)
+				foreach (var item in SBL.Inventory)
 				{
 					(string, int) thisItem = GetItemInfo(item.Key);
 					inventoryInfo += ($"║ { thisItem.Item1} : {thisItem.Item2} ");
-					if(SBL.inventory.Last().Key == item.Key)
+					if(SBL.Inventory.Last().Key == item.Key)
                     {
 						inventoryInfo += "║";
 
@@ -85,7 +85,14 @@ namespace StoryBlocks
 					{ 
 						if(i == 12)
                         {
-							TL[i] = '╬';
+							if(SBL.Inventory.Count == 1)
+                            {
+								TL[i] = '╣';
+                            }
+                            else
+                            {
+								TL[i] = '╬';
+							}
 						}
                         else
                         {

@@ -1,6 +1,5 @@
 ﻿using System;
 using SBM = StoryBlocks.SBMenu;
-using SBCH = StoryBlocks.SBConditionalHandler;
 using SBERR = StoryBlocks.SBErrorHandler;
 using EErrorCode = StoryBlocks.SBErrorHandler.EErrorCode;
 using SBEH = StoryBlocks.SBEventHandler;
@@ -9,22 +8,26 @@ namespace StoryBlocks
     public static class SBLib
     {
         //Dictionary to hold all story blocks ([BLOCK NAME], [BLOCK DATA]).
-        public static Dictionary<string, string> storyBlocks = new Dictionary<string, string>();
-        
+        private static Dictionary<string, string> storyBlocks = new();
+
         //Dictionary to hold string variables ([VARIABLE NAME], ([VARIABLE VALUE], [VISIBILITY FLAG])).
-        public static Dictionary<string, (string, bool)> stringDict = new Dictionary<string, (string, bool)>();
+        public static Dictionary<string, (string, bool)> StringDict = new();
 
         //Dictionary to hold integer variables ([VARIABLE NAME], ([VARIABLE VALUE], [VISIBILITY FLAG])).
-        public static Dictionary<string, (int, bool)> intDict = new Dictionary<string, (int, bool)>();
+        public static Dictionary<string, (int, bool)> IntDict = new();
         
         //Dictionary to hold inventory items ([ITEM NAME], [QUANTITY]).
-        public static Dictionary<string, int> inventory = new Dictionary<string, int>();
-        
+        public static Dictionary<string, int> Inventory = new();
+
+        //Dictionary to hold global conditionals ([ENTIRE LINE], (VARIABLE 1, OPERATION, VARIABLE 2, TRIGGERED FLAG)).
+        public static Dictionary<string, (string, string, string, bool)> GlobalConditional = new();
+
         //List that stores the order of visited blocks, used for the "BACK" block loading argument ([BLOCK NAME]).
-        public static List<string> blockHistory = new List<string>();
-        
+        public static List<string> BlockHistory = new();
+
         //boolean flag to determine if the current line falls within a block.
-        static bool blockStarted;
+        static bool BlockStarted;
+
 
         //default values for string variables.
         static string blockName = "";
@@ -32,6 +35,8 @@ namespace StoryBlocks
         public static string title = "Untitled Story";
         public static string startBlock = "";
         public static string loadedStory = "";
+
+        public static Dictionary<string, string> StoryBlocks { get => storyBlocks; set => storyBlocks = value; }
 
         static SBLib()
         {
@@ -43,22 +48,24 @@ namespace StoryBlocks
         {
             loadedStory = filePath;
             string? line;
+
+           
             StreamReader reader = File.OpenText(filePath);
 
             while ((line = reader.ReadLine()) != null)
             {
-                if (line.EndsWith("::") && !blockStarted)
+                if (line.EndsWith("::") && !BlockStarted)
                 {
-                    blockStarted = true;
+                    BlockStarted = true;
                     blockName = line.TrimEnd(':');
                 }
-                else if (line.StartsWith("::") && blockStarted)
+                else if (line.StartsWith("::") && BlockStarted)
                 {
-                    blockStarted = false;
-                    storyBlocks.Add(blockName, blockData);
+                    BlockStarted = false;
+                    StoryBlocks.Add(blockName, blockData);
                     blockData = "";
                 }
-                else if (line.EndsWith("::") && line.IndexOf("::") > 0 && blockStarted)
+                else if (line.EndsWith("::") && line.IndexOf("::") > 0 && BlockStarted)
                 {
                     SBERR.ThrowError((int)EErrorCode.unfinishedBlock, blockName);
                 }
@@ -77,70 +84,70 @@ namespace StoryBlocks
         //clears dictionaries for variables, inventory, and block history.
         public static void ClearDicts()
         {
-            stringDict.Clear();
-            intDict.Clear();
-            inventory.Clear();
-            blockHistory.Clear();
+            StringDict.Clear();
+            IntDict.Clear();
+            Inventory.Clear();
+            BlockHistory.Clear();
         }
 
         //finds variable name in the dictionaries and toggles the visibility flag.
         //name: name of variable to toggle
-        public static void toggleVisibility(string name)
+        public static void ToggleVisibility(string name)
         {
-            if (intDict.ContainsKey(name))
+            if (IntDict.ContainsKey(name))
             {
-                int value = intDict[name].Item1;
+                int value = IntDict[name].Item1;
 
-                if (intDict[name].Item2 == true)
+                if (IntDict[name].Item2 == true)
                 {
-                    intDict[name] = (value, false);
+                    IntDict[name] = (value, false);
                 }
-                else if (intDict[name].Item2 == false)
+                else if (IntDict[name].Item2 == false)
                 {
-                    intDict[name] = (value, true);
+                    IntDict[name] = (value, true);
                 }
             }
             
-            else if (stringDict.ContainsKey(name))
+            else if (StringDict.ContainsKey(name))
             {
-                string value = stringDict[name].Item1;
+                string value = StringDict[name].Item1;
 
-                if (stringDict[name].Item2 == true)
+                if (StringDict[name].Item2 == true)
                 {
-                    stringDict[name] = (value, false);
+                    StringDict[name] = (value, false);
                 }
-                else if (stringDict[name].Item2 == false)
+                else if (StringDict[name].Item2 == false)
                 {
-                    stringDict[name] = (value, true);
+                    StringDict[name] = (value, true);
                 }
             }
         }
 
         //Sets visibility flag of a variable to true (visible).
         //name: name of variable to make visible
-        public static void makeVisible(string name)
+        public static void MakeVisible(string name)
         {
-            if (intDict.ContainsKey(name))
+            if (IntDict.ContainsKey(name))
             {
-                intDict[name] = (intDict[name].Item1, true);
+                IntDict[name] = (IntDict[name].Item1, true);
             }
-            if (stringDict.ContainsKey(name))
+            if (StringDict.ContainsKey(name))
             {
-                stringDict[name] = (stringDict[name].Item1, true);
+                StringDict[name] = (StringDict[name].Item1, true);
             }
         }
 
         //Sets visibility flag of a variable to false (hidden).
         //name: name of variable to make hidden
-        public static void makeHidden(string name)
+        public static void MakeHidden(string name)
         {
-            if (intDict.ContainsKey(name))
+            if (IntDict.ContainsKey(name))
             {
-                intDict[name] = (intDict[name].Item1, false);
+                IntDict[name] = (IntDict[name].Item1, false);
             }
-            if (stringDict.ContainsKey(name))
+            if (StringDict.ContainsKey(name))
             {
-                stringDict[name] = (stringDict[name].Item1, false);
+                StringDict[name] = (StringDict[name].Item1, false);
             }
         }
 
@@ -148,8 +155,8 @@ namespace StoryBlocks
         public static void LoadConfig()
         {
             ClearDicts();
-            inventory.Clear();
-            string[] configData = storyBlocks["CONFIG"].Split(new string[] { "\n" }, StringSplitOptions.None);
+            Inventory.Clear();
+            string[] configData = StoryBlocks["CONFIG"].Split(new string[] { "\n" }, StringSplitOptions.None);
             foreach (string config in configData)
             {
                 SBEH.PrefixOperation(config);
@@ -161,7 +168,7 @@ namespace StoryBlocks
         public static void LoadBlock(string BlockName)
         {
             Console.Clear();
-            blockHistory.Add(BlockName);
+            BlockHistory.Add(BlockName);
             SBM.CreateMenu(BlockName);
         }
 
