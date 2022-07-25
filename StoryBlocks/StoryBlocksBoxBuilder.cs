@@ -84,17 +84,34 @@ namespace StoryBlocks
 
         }
 
-		public static void DrawBox(Dictionary<string, string> menu, string? title = null, string style = "DOUBLE", int xCoord = 0, int yCoord = 0)
+		public static void DrawBox(string text, string? title = null, string style = "DOUBLE", int xCoord = 0, int yCoord = 0, string textColor = "WHITE", string bkgColor = "BLACK")
+        {
+			List<string> menuText = new();
+			menuText.Add(text);
+			DrawBox(menuText, title, style, xCoord, yCoord, textColor, bkgColor);
+		}
+
+		public static void DrawBox(Dictionary<string, int> menu, string? title = null, string style = "DOUBLE", int xCoord = 0, int yCoord = 0, string textColor = "WHITE", string bkgColor = "BLACK")
         {
 			List<string> menuText = new();
 			foreach(var item in menu)
             {
-				menuText.Add(item.Value);
+				menuText.Add($"{item.Key} : {item.Value}");
             }
-			DrawBox(menuText, title, style, xCoord, yCoord);
+			DrawBox(menuText, title, style, xCoord, yCoord, textColor, bkgColor);
         }
 
-		public static void DrawBox(List<string> text, string? title = null, string style = "DOUBLE", int xCoord = 0, int yCoord = 0)
+		public static void DrawBox(Dictionary<string, string> menu, string? title = null, string style = "DOUBLE", int xCoord = 0, int yCoord = 0, string textColor = "WHITE", string bkgColor = "BLACK")
+		{
+			List<string> menuText = new();
+			foreach (var item in menu)
+			{
+				menuText.Add(item.Value);
+			}
+			DrawBox(menuText, title, style, xCoord, yCoord, textColor, bkgColor);
+		}
+
+		public static void DrawBox(List<string> text, string? title = null, string style = "DOUBLE", int xCoord = 0, int yCoord = 0, string textColor = "WHITE", string bkgColor = "BLACK")
         {
 			List<char> boxParts = new();
 			int longestLine = GetLongestLength(text, 9);
@@ -124,7 +141,8 @@ namespace StoryBlocks
 			char RT = boxParts[(int)EBoxElements.RT];
 			char X = boxParts[(int)EBoxElements.X];
 
-
+			Console.ForegroundColor = SBTH.getColor(textColor);
+			Console.BackgroundColor = SBTH.getColor(bkgColor);
 			Console.SetCursorPosition(xCoord, yCoord);
 
 			if (title != null)
@@ -132,7 +150,7 @@ namespace StoryBlocks
 				SBTH.PrintText(TL.ToString().PadRight(title.Length + 3, H) + TR);
 				yCoord++;
 				Console.SetCursorPosition(xCoord, yCoord);
-				SBTH.PrintText(V + $" {title} " + V);
+				SBTH.PrintText($"{V} {title} {V}");
 				yCoord++;
 				Console.SetCursorPosition(xCoord, yCoord);
 				SBTH.PrintText((RT.ToString().PadRight(title.Length + 3, H) + UT.ToString()).PadRight(longestLine, H) + TR);
@@ -141,14 +159,17 @@ namespace StoryBlocks
             {
 				SBTH.PrintText(TL.ToString().PadRight(longestLine, H) + TR);
 			}
-			//
+
 			for (int i = 0; i < text.Count; i++)
             {
 				Console.SetCursorPosition(xCoord, yCoord + i + 1);
 				SBTH.PrintText(($"{V}    {text[i]}    ").PadRight(longestLine, ' ') + V);
             }
+
 			Console.SetCursorPosition(xCoord, yCoord + text.Count + 1);
 			SBTH.PrintText(BL.ToString().PadRight(longestLine, H) + BR);
+
+			Console.ResetColor();
 		}
 	
 	

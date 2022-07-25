@@ -1,6 +1,7 @@
 ﻿using SBL = StoryBlocks.SBLib;
 using SBM = StoryBlocks.SBMenu;
 using SBDS = StoryBlocks.SBDefaultStory;
+using SBFH = StoryBlocks.SBFileHandler;
 namespace StoryBlocks
 {
     public class StoryBlocksMain
@@ -29,11 +30,10 @@ namespace StoryBlocks
         public static void LoadStory(string story)
         {
             Console.Clear();
-            SBL.StoryBlocks.Clear();
             SBL.ClearDicts();
-            SBL.CreateBlocks(story);
-            SBL.LoadConfig();
-            Console.Title = $"StoryBlocks: {SBL.title}";
+            SBFH.CreateBlocks(story);
+            SBFH.LoadConfig();
+            Console.Title = $"StoryBlocks: {SBFH.title}";
             SBM.CreateMenu("MAIN MENU");
         }
     }

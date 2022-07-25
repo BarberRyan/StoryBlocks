@@ -12,7 +12,7 @@ namespace StoryBlocks
 			unfinishedBlock
         }
 
-		public static void ThrowError(int errorCode, string option1 = "", string option2 = "")
+		public static void ThrowError(int errorCode, int lineNumber, string option1 = "", string option2 = "")
         {
 			string errorText = "";
 			Console.Clear();
@@ -24,7 +24,7 @@ namespace StoryBlocks
 					errorText = $"ERROR! Block by the name of \"{option1}\" does not exist!\n\nPress any button to return to the main menu.";
 					break;
 				case (int)EErrorCode.unfinishedBlock:
-					errorText = $"ERROR! Block by the name of \"{option1}\" does not end properly!\nBlocks must end with :: on a line by itself to be valid!\n\nPress any button to return to the main menu.";
+					errorText = $"ERROR! Block by the name of \"{option1}\" does not end properly!\nBlocks must end with :: on a line by itself to be valid!\n\nCheck block starting at line {lineNumber} for issues.\n\nPress any button to return to the main menu.";
 					break;
             }
 			Console.WriteLine(errorText);

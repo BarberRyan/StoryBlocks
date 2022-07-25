@@ -60,64 +60,7 @@ namespace StoryBlocks
         {
 			if (SBL.Inventory.Count() > 0)
 			{
-				Console.WriteLine("╔═══════════╗");
-				Console.WriteLine("║ INVENTORY ║");
-				string inventoryInfo = "";
-				foreach (var item in SBL.Inventory)
-				{
-					(string, int) thisItem = GetItemInfo(item.Key);
-					inventoryInfo += ($"║ { thisItem.Item1} : {thisItem.Item2} ");
-					if(SBL.Inventory.Last().Key == item.Key)
-                    {
-						inventoryInfo += "║";
-
-					}
-				}
-				if(inventoryInfo.Length < 11)
-                {
-					inventoryInfo = inventoryInfo.PadRight(13, ' ');
-                }
-				string topLine = "╠═══════════╩".PadRight(inventoryInfo.Length - 1, '═') + "╗";
-				var TL = new StringBuilder(topLine);
-				for (int i = 1; i < inventoryInfo.Length - 1; i++)
-				{
-					if (inventoryInfo[i] == '║')
-					{ 
-						if(i == 12)
-                        {
-							if(SBL.Inventory.Count == 1)
-                            {
-								TL[i] = '╣';
-                            }
-                            else
-                            {
-								TL[i] = '╬';
-							}
-						}
-                        else
-                        {
-							TL[i] = '╦';
-						}
-						
-
-					}
-				}
-
-				Console.WriteLine(TL.ToString());
-				Console.WriteLine(inventoryInfo);
-
-				string bottomLine = "╚".PadRight(inventoryInfo.Length - 1, '═') + "╝";
-				var BL = new StringBuilder(bottomLine);
-				
-				for(int i = 1; i < inventoryInfo.Length - 1; i++)
-                {
-                    if (inventoryInfo[i] == '║')
-                    {
-						BL[i] = '╩';
-
-					}
-                }
-				Console.WriteLine(BL.ToString());
+				SBBoxBuilder.DrawBox(menu: SBL.Inventory, title: "INVENTORY", yCoord: 15, bkgColor: "dark grey");
 			}
 		}
 	}

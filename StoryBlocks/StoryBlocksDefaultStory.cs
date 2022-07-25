@@ -71,7 +71,7 @@ namespace StoryBlocks
 
             writer.WriteLine("Enter name::\n" +
                                 "!!:Name\n" +
-                                "!=:Name: Enter your name!:red\n" +
+                                "!=:Name:{Enter your name!}[Red]\n" +
                                 "::\n");
 
             writer.WriteLine("Find a dollar::\n" +

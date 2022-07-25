@@ -9,13 +9,14 @@ using SBPH = StoryBlocks.SBPrefixHandler;
 using SBERR = StoryBlocks.SBErrorHandler;
 using EErrorCode = StoryBlocks.SBErrorHandler.EErrorCode;
 using SBTH = StoryBlocks.SBTextHandler;
+using SBFH = StoryBlocks.SBFileHandler;
 
 namespace StoryBlocks
 {
 	public static class SBMenu
 	{
 		//Dictionary to hold items for the menu ([BLOCK TO LOAD ON USE], [DISPLAY TEXT]).
-		public static Dictionary<string, string> Menu = new();
+		static readonly Dictionary<string, string> Menu = new();
 		
 		//Initializing integer varaibles.
 		static int activeOption = 1;
@@ -23,14 +24,14 @@ namespace StoryBlocks
 	
 		//Initializing string variables
 		static string menuName = "";
-		static List<string> menuData = new List<string>();
+		static List<string> menuData = new();
 
 		static SBMenu()
 		{
 		}
 		
 
-		public static void addMenuElement(string command, string text = "")
+		public static void AddMenuElement(string command, string text = "")
         {
 			if(command == "S" && Menu.ContainsKey("S"))
             {
@@ -38,32 +39,22 @@ namespace StoryBlocks
             }
             else
             {
+                if (!Menu.ContainsKey(command))
+                {
 				Menu.Add(command, text);
+                }
             }
         }
 
-		//Adds a new line of text to a menu option (currently only used for "S:" lines).
-		//command: Key to update in Menu dictionary
-		//text: Text to add to the option on a new line
-		public static void concatMenuElement(string command, string text)
+		public static void CreateDialog(string dialogName, string? title = null, int xCoord = 0, int yCoord = 0, string textColor = "WHITE", string bkgColor = "BLACK")
         {
-            Menu[command] = (Menu[command] + "\n" + text);
-        }
+			
+        } 
 
-		//Adds a new line of text to a menu option and changes the color options (currently only used for "S:" lines).
-		//command: Key to update in Menu dictionary
-		//text: Text to add to the option on a new line
-		//textColor: ConsoleColor value for the foreground color
-		//bkgColo: ConsoleColor value for the background color
-		public static void concatMenuElement(string command, string text, string textColor, string bkgColor)
-        {
-			Menu[command] = (Menu[command] + "\n" + text);
-		}
 
-		
 		//Processes the block data from the StoryBlocks dictionary to populate data needed for the menu screen.
 		//BlockName: name of the block to process
-		public static void CreateMenu(string BlockName)
+		public static void CreateMenu(string BlockName, bool flag = true)
 		{
 			menuName = BlockName;
 			Menu.Clear();
@@ -76,23 +67,23 @@ namespace StoryBlocks
 			}
             else
             {
-				SBErrorHandler.ThrowError((int)EErrorCode.noBlock, BlockName);
-				SB.LoadStory(SBL.loadedStory);
+				SBErrorHandler.ThrowError((int)EErrorCode.noBlock, 0, BlockName);
+				SB.LoadStory(SBFH.loadedStory);
 			}
 			
 			//Loops through each line to find prefixes and act on them.
 			foreach (string menuItem in menuData)
 			{
-				SBEH.PrefixOperation(menuItem);
+				SBEH.PrefixOperation(menuItem, flag);
             }
 
 			//Draws the inventory if there is anything in it, and if not on the main menu or about screens.
 			//inventory use functions are not implemented yet.
 			if(SBL.Inventory.Count > 0)
             {
-				if(BlockName != "MAIN MENU" && BlockName != "ABOUT")
+				if(BlockName != "MAIN MENU" && BlockName != "ABOUT" && BlockName != "INVENTORY")
                 {
-					addMenuElement("INVENTORY", "-Inventory-");
+					AddMenuElement("INVENTORY", "-Inventory-");
 				}
             }
 
@@ -115,20 +106,20 @@ namespace StoryBlocks
 			//Block load command that starts the first block of the story.
 			else if(menuCommand == "START")
             {
-				SBL.StartStory();
+				SBFH.StartStory();
             }
 
 			//Block load command that loads the main menu (and clears variables).
 			else if(menuCommand == "MAIN MENU")
 			{
-				SBL.LoadConfig();
-				SBL.LoadBlock(menuCommand);
+				SBFH.LoadConfig();
+				SBFH.LoadBlock(menuCommand);
 			}
 
 			//Block load command that loads the last visited block in blockHistory.
 			else if(menuCommand == "BACK")
 			{
-				goBack();
+				GoBack();
 			}
 
 			//Block load command that completely reloads the story as if it was just opened. 
@@ -136,17 +127,23 @@ namespace StoryBlocks
             {
 				Console.Clear();
 				Console.CursorVisible = false;
-				SB.LoadStory(SBL.loadedStory);
+				SB.LoadStory(SBFH.loadedStory);
             }
 			//Loads the block provided in the line.
-            else
+            
+			else if(menuCommand == "INVENTORY")
             {
-				SBL.LoadBlock(menuCommand);
+				InventoryMenu();
+            }
+
+			else
+            {
+				SBFH.LoadBlock(menuCommand);
             }
 		}
 
 		//Finds the last block visited in blockHistory and goes to it, removing the current block from the history.
-		public static void goBack()
+		public static void GoBack()
         {
 			int lastIndex = SBL.BlockHistory.Count - 1;
 			string lastBlock = "MAIN MENU";
@@ -154,7 +151,7 @@ namespace StoryBlocks
             {
 				lastBlock = SBL.BlockHistory[lastIndex - 1];
 			}
-			if(SBL.BlockHistory.Count() > 0)
+			if(SBL.BlockHistory.Count > 0)
             {
 				SBL.BlockHistory.RemoveAt(lastIndex);
 			}
@@ -167,8 +164,8 @@ namespace StoryBlocks
             {
 				SBL.BlockHistory.Clear();
             }
-			
-			SBL.LoadBlock(lastBlock);
+
+			SBFH.LoadBlock(lastBlock, false);
 		}
 
 		public static void FileMenu()
@@ -176,12 +173,14 @@ namespace StoryBlocks
 			Console.Title = "StoryBlocks";
 			menuName = "FILE MENU";
 			Console.Clear();
+			SBL.ClearDicts();
 			Menu.Clear();
-			IEnumerable<string> files = System.IO.Directory.EnumerateFiles(System.IO.Directory.GetCurrentDirectory() + @"\Stories");
+			IEnumerable<string> files;
+			files = System.IO.Directory.EnumerateFiles(System.IO.Directory.GetCurrentDirectory() + @"\Stories");
 			fileCount = files.Count();
 			if (fileCount > 1)
 			{
-				addMenuElement("S", "            {██╗     ███████╗██████╗}[cyan]\n" +
+				AddMenuElement("S", "            {██╗     ███████╗██████╗}[cyan]\n" +
 									"            {╚██╗ ██╗██╔════╝██╔══██╗}[cyan]\n" +
 									"            { ╚██╗╚═╝███████╗██████╔╝}[cyan]\n" +
 									"            { ██╔╝██╗╚════██║██╔══██╗}[cyan]\n" +
@@ -192,23 +191,23 @@ namespace StoryBlocks
 
 				foreach (var item in files)
 				{
-					string name = "";
-					string? desc = "";
+					string name;
+					string? desc;
 					if (item.EndsWith(".txt"))
                     {
-						name = item.Substring(item.IndexOf(@"Stories\") + 8).Replace(".txt", "");
+						name = item[(item.IndexOf(@"Stories\") + 8)..].Replace(".txt", "");
 
 						if (name == "default")
 						{
 							continue;
 						}
-						desc = getDescription(item);
-						addMenuElement(name, $"{name} : {desc}");
+						desc = GetStoryDescription(item);
+						AddMenuElement(name, $"{name} : {desc}");
 					}
 				}
-				addMenuElement("BLANK", "BLANK");
-				addMenuElement("RELOAD", "Reload the story list");
-				addMenuElement("EXIT", "Exit the program");
+				AddMenuElement("BLANK", "BLANK");
+				AddMenuElement("RELOAD", "Reload the story list");
+				AddMenuElement("EXIT", "Exit the program");
 				
 				string storyName = RunMenu();
 				
@@ -229,7 +228,33 @@ namespace StoryBlocks
             }
 		}
 
-		static string getDescription(string filePath)
+		public static void InventoryMenu()
+        {
+			menuName = "INVENTORY";
+			Console.Clear();
+			Menu.Clear();
+			SBL.BlockHistory.Add("INVENTORY");
+			AddMenuElement("S", "INVENTORY");
+			
+			foreach (var item in SBL.Inventory)
+			{
+				AddMenuElement(item.Key, $"{item.Key} : {item.Value}");
+            }
+
+			AddMenuElement("BLANK", "BLANK");
+			AddMenuElement("BACK", "Go back");
+
+			string itemSelected = RunMenu();
+
+			if(itemSelected == "BACK")
+            {
+				GoBack();
+            }
+
+
+        }
+
+		static string GetStoryDescription(string filePath)
         {
 			string? line;
 			StreamReader reader = File.OpenText(filePath);
@@ -238,7 +263,7 @@ namespace StoryBlocks
                 if (line.StartsWith("D:"))
                 {
 					reader.Close();
-					return line.Substring(2);
+					return line[2..];
                 }
             }
 			reader.Close();
@@ -252,7 +277,7 @@ namespace StoryBlocks
 			if (Menu.ContainsKey("S"))
 			{
 				Console.ResetColor();
-                SBTextHandler.PrintText(SBEH.replaceVariable(Menu["S"]) + "\n\n");
+                SBTextHandler.PrintText(SBEH.ReplaceVariable(Menu["S"]) + "\n\n");
 			}
 			//iterates through each choice line to provide menu choices, and updates cursor position.
 			for (int i = 1; i < Menu.Count; i++)
@@ -265,18 +290,18 @@ namespace StoryBlocks
 
 				if (activeOption == i)
 				{
-					SBTH.PrintText(SBEH.replaceVariable($">> {Menu.ElementAt(i).Value} <<"));
+					SBTH.PrintText(SBEH.ReplaceVariable($">> {Menu.ElementAt(i).Value} <<"));
 				}
 				else
 				{
-					SBTH.PrintText(SBEH.replaceVariable($"   {Menu.ElementAt(i).Value}   "));
+					SBTH.PrintText(SBEH.ReplaceVariable($"   {Menu.ElementAt(i).Value}   "));
 				}
 
 				Console.ResetColor();
 			}
 
 			//Prints visible variables to the screen.
-			if (!(menuName == "MAIN MENU") && !(menuName == "ABOUT") && !(menuName == "FILE MENU"))
+			if (!(menuName == "MAIN MENU") && !(menuName == "ABOUT") && !(menuName == "FILE MENU") && !(menuName == "INVENTORY"))
             {
 				Console.WriteLine("\n\n");
 				foreach (var item in SBL.StringDict)
@@ -303,6 +328,7 @@ namespace StoryBlocks
 		//To Do: Move to event handler class, add more input options.
 		public static string RunMenu()
         {
+			SBEH.CheckGlobalConditionals();
 			activeOption = 1;
 			ConsoleKey pressedKey;
 			do
@@ -357,7 +383,7 @@ namespace StoryBlocks
                     }
                     else
                     {
-						SBL.LoadBlock("MAIN MENU");
+						SBFH.LoadBlock("MAIN MENU");
                     }
                 }
 			} while (pressedKey != ConsoleKey.Enter);

@@ -14,6 +14,7 @@ namespace StoryBlocks
 			"1:",
 			"T:",
 			"S:",
+			"O:",
 			">:",
 			"!I:",
 			"XI:",
@@ -29,6 +30,12 @@ namespace StoryBlocks
 			"?!=:",
 			"?>=:",
 			"?>:",
+			"??<:",
+			"??<=:",
+			"??=:",
+			"??!=:",
+			"??>=:",
+			"??>:",
 			"I+:",
 			"I-:",
 			"!=:",
@@ -45,6 +52,7 @@ namespace StoryBlocks
 			startBlock,
 			title,
 			story,
+			outputOption,
 			menuChoice,
 			visibleInt,
 			hiddenInt,
@@ -60,6 +68,12 @@ namespace StoryBlocks
 			notEqual,
 			greaterOrEqual,
             greaterThan,
+			GlobalLessThan,
+			GlobalLessOrEqual,
+			GlobalEqual,
+			GlobalNotEqual,
+			GlobalGreaterOrEqual,
+			GlobalGreaterThan,
 			inventoryAdd,
 			inventorySubtract,
 			inputVisible,
@@ -90,15 +104,16 @@ namespace StoryBlocks
 		//line: line string provided by StreamReader
 		public static string GetPrefix(string line)
         {
+            if (!line.Contains(@"\:"))
+            {
 			return line[..(line.IndexOf(':') + 1)];
+            }
+            else
+            {
+				return "";
+            }
         }
 
-		public static string GetSubPrefix(string line)
-        {
-			string mainPrefix = GetPrefix(line);
-			string subPrefix = line[mainPrefix.Length..];
-			return subPrefix;
-        }
 		public static string GetNextPrefix(string line)
         {
 			string subPrefix = line[GetPrefix(line).Length..];

@@ -9,6 +9,7 @@ namespace StoryBlocks
     {
         //Dictionary to hold all story blocks ([BLOCK NAME], [BLOCK DATA]).
         private static Dictionary<string, string> storyBlocks = new();
+        public static Dictionary<string, string> StoryBlocks { get => storyBlocks; set => storyBlocks = value; }
 
         //Dictionary to hold string variables ([VARIABLE NAME], ([VARIABLE VALUE], [VISIBILITY FLAG])).
         public static Dictionary<string, (string, bool)> StringDict = new();
@@ -19,66 +20,17 @@ namespace StoryBlocks
         //Dictionary to hold inventory items ([ITEM NAME], [QUANTITY]).
         public static Dictionary<string, int> Inventory = new();
 
-        //Dictionary to hold global conditionals ([ENTIRE LINE], (VARIABLE 1, OPERATION, VARIABLE 2, TRIGGERED FLAG)).
-        public static Dictionary<string, (string, string, string, bool)> GlobalConditional = new();
+        //Dictionary to hold global conditionals ([ENTIRE LINE], [TRIGGERED FLAG]).
+        public static Dictionary<string, bool> GlobalConditional = new();
 
         //List that stores the order of visited blocks, used for the "BACK" block loading argument ([BLOCK NAME]).
         public static List<string> BlockHistory = new();
 
-        //boolean flag to determine if the current line falls within a block.
-        static bool BlockStarted;
+        public static string OutputOption = "CONSOLE";
 
-
-        //default values for string variables.
-        static string blockName = "";
-        static string blockData = "";
-        public static string title = "Untitled Story";
-        public static string startBlock = "";
-        public static string loadedStory = "";
-
-        public static Dictionary<string, string> StoryBlocks { get => storyBlocks; set => storyBlocks = value; }
 
         static SBLib()
         {
-        }
-
-        //steps through the story file line by line to determine where each block is and what it contains.
-        //filePath: file path of story file
-        public static void CreateBlocks(string filePath)
-        {
-            loadedStory = filePath;
-            string? line;
-
-           
-            StreamReader reader = File.OpenText(filePath);
-
-            while ((line = reader.ReadLine()) != null)
-            {
-                if (line.EndsWith("::") && !BlockStarted)
-                {
-                    BlockStarted = true;
-                    blockName = line.TrimEnd(':');
-                }
-                else if (line.StartsWith("::") && BlockStarted)
-                {
-                    BlockStarted = false;
-                    StoryBlocks.Add(blockName, blockData);
-                    blockData = "";
-                }
-                else if (line.EndsWith("::") && line.IndexOf("::") > 0 && BlockStarted)
-                {
-                    SBERR.ThrowError((int)EErrorCode.unfinishedBlock, blockName);
-                }
-                else
-                {
-                    if (!line.StartsWith("//"))
-                    {
-                        blockData += (line + "\n");
-                    }
-                    
-                }
-            }
-            reader.Close();
         }
 
         //clears dictionaries for variables, inventory, and block history.
@@ -88,6 +40,26 @@ namespace StoryBlocks
             IntDict.Clear();
             Inventory.Clear();
             BlockHistory.Clear();
+        }
+
+        public static string GetDictValue(string key)
+        {
+            if (IntDict.ContainsKey(key))
+            {
+                return IntDict[key].Item1.ToString();
+            }
+
+            if (StringDict.ContainsKey(key))
+            {
+                return StringDict[key].Item1;
+            }
+
+            if (Inventory.ContainsKey(key))
+            {
+                return Inventory[key].ToString();
+            }
+
+            return key;
         }
 
         //finds variable name in the dictionaries and toggles the visibility flag.
@@ -149,33 +121,6 @@ namespace StoryBlocks
             {
                 StringDict[name] = (StringDict[name].Item1, false);
             }
-        }
-
-        //Loads and parses the "CONFIG" block.
-        public static void LoadConfig()
-        {
-            ClearDicts();
-            Inventory.Clear();
-            string[] configData = StoryBlocks["CONFIG"].Split(new string[] { "\n" }, StringSplitOptions.None);
-            foreach (string config in configData)
-            {
-                SBEH.PrefixOperation(config);
-            }
-        }
-
-        //Loads the specified block to the screen.
-        //BlockName: name of the block to load
-        public static void LoadBlock(string BlockName)
-        {
-            Console.Clear();
-            BlockHistory.Add(BlockName);
-            SBM.CreateMenu(BlockName);
-        }
-
-        //Loads the story block specified in the CONFIG block for the beginning of the story.
-        public static void StartStory()
-        {
-            LoadBlock(startBlock);
         }
     }
 }

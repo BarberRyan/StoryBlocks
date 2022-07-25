@@ -41,7 +41,7 @@ namespace StoryBlocks
 					}
                     else
                     {
-					colors.Add((item, "BLACK"));
+						colors.Add((item, "BLACK"));
                     }
 				}
 			}
@@ -51,38 +51,38 @@ namespace StoryBlocks
 		public static void PrintText(string inputString)
         {
 			inputString = ExtractColors(inputString);
+			if (SBLib.OutputOption == "CONSOLE")
+			{
 
-			for (int i = 0; i < inputString.Length; i++)
-            {
-				if(inputString[i] == '{')
-                {	
-					if(colors.Count > 0)
-                    {
-						Console.ForegroundColor = getColor(colors.ElementAt(0).Item1, true);
-						Console.BackgroundColor = getColor(colors.ElementAt(0).Item2, false);
-						colors.Remove(colors.ElementAt(0));
+				for (int i = 0; i < inputString.Length; i++)
+				{
+					if (inputString[i] == '{')
+					{
+						if (colors.Count > 0)
+						{
+							Console.ForegroundColor = getColor(colors.ElementAt(0).Item1, true);
+							Console.BackgroundColor = getColor(colors.ElementAt(0).Item2, false);
+							colors.Remove(colors.ElementAt(0));
+						}
 
+						continue;
 					}
-
-					continue;
-                }
-                if (inputString[i] == '}')
-                {
-					Console.ResetColor();
-					continue;
-                }
-				Console.Write(inputString[i]);
-				if(i == inputString.Length - 1)
-                {
-					Console.Write("\n");
-                }
-            }
+					if (inputString[i] == '}')
+					{
+						Console.ResetColor();
+						continue;
+					}
+					Console.Write(inputString[i]);
+					if (i == inputString.Length - 1)
+					{
+						Console.Write("\n");
+					}
+				}
+			}
         }
 
- 
-
 		//Takes in a string and returns a corresponding ConsoleColor.
-		//input: string argument for color provided at the end of a line (":[TEXT COLOR]:[BACKGROUND COLOR]")
+		//input: string argument for color provided in a line ("{TEXT TO CHANGE}[TEXT COLOR][BACKGROUND COLOR]")
 		//text: true = foreground color, false = background color.
 		public static ConsoleColor getColor(string input, bool text = true)
 		{
@@ -152,6 +152,16 @@ namespace StoryBlocks
 
 				case "YELLOW":
 					return ConsoleColor.Yellow;
+
+				case "RANDOM":
+					var consoleColors = Enum.GetValues(typeof(ConsoleColor));
+					var r = new Random();
+					ConsoleColor randColor = (ConsoleColor)consoleColors.GetValue(r.Next(consoleColors.Length));
+					while(randColor == Console.BackgroundColor)
+                    {
+						randColor = (ConsoleColor)consoleColors.GetValue(r.Next(consoleColors.Length));
+					}
+					return randColor;
 
 				default:
 					if (text)
