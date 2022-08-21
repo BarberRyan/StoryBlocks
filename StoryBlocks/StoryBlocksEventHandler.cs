@@ -162,12 +162,18 @@ namespace StoryBlocks
 				case (int)EPrefix.lessThan:
 					if (SBL.IntDict[Elements[0]].Item1 < Int32.Parse(Elements[1]))
 					{
-						PrefixOperation(SBPH.GetNextPrefix(Line));
+                        if (flag)
+                        {
+							PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                        }
 						return true;
 					}
 					else if (SBL.Inventory.ContainsKey(Elements[0]) && SBL.Inventory[Elements[0]] < Int32.Parse(Elements[1]))
 					{
-						PrefixOperation(SBPH.GetNextPrefix(Line));
+                        if (flag)
+                        {
+							PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                        }
 						return true;
 					}
 					return false;
@@ -176,12 +182,18 @@ namespace StoryBlocks
 				case (int)EPrefix.lessOrEqual:
 					if (SBL.IntDict[Elements[0]].Item1 <= Int32.Parse(Elements[1]))
 					{
-						PrefixOperation(SBPH.GetNextPrefix(Line));
+                        if (flag)
+                        {
+							PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                        }
 						return true;
 					}
 					else if (SBL.Inventory.ContainsKey(Elements[0]) && SBL.Inventory[Elements[0]] <= Int32.Parse(Elements[1]))
 					{
-						PrefixOperation(SBPH.GetNextPrefix(Line));
+						if(flag)
+                        {
+							PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                        }
 						return true;
 					}
 					return false;
@@ -191,17 +203,26 @@ namespace StoryBlocks
 				case (int)EPrefix.equal:
 					if (SBL.IntDict.ContainsKey(Elements[0]) && SBL.IntDict[Elements[0]] == (Int32.Parse(Elements[1]), SBL.IntDict[Elements[0]].Item2))
 					{
-						PrefixOperation(SBPH.GetNextPrefix(Line));
+                        if (flag)
+                        {
+							PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                        }
 						return true;
 					}
 					else if (SBL.StringDict.ContainsKey(Elements[0]) && SBL.StringDict[Elements[0]] == (Elements[1], SBL.StringDict[Elements[0]].Item2))
 					{
-						PrefixOperation(SBPH.GetNextPrefix(Line));
+                        if (flag)
+                        {
+							PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                        }
 						return true;
 					}
 					else if (SBL.Inventory.ContainsKey(Elements[0]) && SBL.Inventory[Elements[0]] == Int32.Parse(Elements[1]))
 					{
-						PrefixOperation(SBPH.GetNextPrefix(Line));
+                        if (flag)
+                        {
+							PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                        }
 						return true;
 					}
 					return false;
@@ -211,17 +232,26 @@ namespace StoryBlocks
 				case (int)EPrefix.notEqual:
 					if (SBL.IntDict.ContainsKey(Elements[0]) && SBL.IntDict[Elements[0]] != (Int32.Parse(Elements[1]), SBL.IntDict[Elements[0]].Item2))
 					{
-						PrefixOperation(SBPH.GetNextPrefix(Line));
+                        if (flag)
+                        {
+							PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                        }
 						return true;
 					}
 					else if (SBL.StringDict.ContainsKey(Elements[0]) && SBL.StringDict[Elements[0]] != (Elements[1], SBL.StringDict[Elements[0]].Item2))
 					{
-						PrefixOperation(SBPH.GetNextPrefix(Line));
+                        if (flag)
+                        {
+							PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                        }
 						return true;
 					}
 					else if (SBL.Inventory.ContainsKey(Elements[0]) && SBL.Inventory[Elements[0]] != Int32.Parse(Elements[1]))
 					{
-						PrefixOperation(SBPH.GetNextPrefix(Line));
+                        if (flag)
+                        {
+							PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                        }
 						return true;
 					}
 					return false;
@@ -232,7 +262,10 @@ namespace StoryBlocks
                     {
 						if (SBL.IntDict[Elements[0]].Item1 >= Int32.Parse(Elements[1]))
 						{
-							PrefixOperation(SBPH.GetNextPrefix(Line));
+							if (flag)
+                            {
+								PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                            }
 							return true;
 						}
                     }
@@ -240,7 +273,10 @@ namespace StoryBlocks
                     {
 						if (SBL.Inventory[Elements[0]] >= Int32.Parse(Elements[1]))
 						{
-							PrefixOperation(SBPH.GetNextPrefix(Line));
+                            if (flag)
+                            {
+								PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                            }
 							return true;
 						}
                     }
@@ -250,12 +286,18 @@ namespace StoryBlocks
 				case (int)EPrefix.greaterThan:
 					if (SBL.IntDict.ContainsKey(Elements[0]) && SBL.IntDict[Elements[0]].Item1 > Int32.Parse(Elements[1]))
 					{
-						PrefixOperation(SBPH.GetNextPrefix(Line));
+                        if (flag)
+                        {
+							PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                        }
 						return true;
 					}
 					else if (SBL.Inventory.ContainsKey(Elements[0]) && SBL.Inventory[Elements[0]] > Int32.Parse(Elements[1]))
 					{
-						PrefixOperation(SBPH.GetNextPrefix(Line));
+                        if (flag)
+                        {
+							PrefixOperation(SBPH.GetNextPrefix(Line), flag);
+                        }
 						return true;
 					}
 					return false;
@@ -268,7 +310,11 @@ namespace StoryBlocks
 				case (int)EPrefix.GlobalGreaterThan:
                     if (!SBL.GlobalConditional.ContainsKey(Line))
                     {
-						SBL.GlobalConditional.Add(Line, false);
+						Console.Clear();
+                        if (!SBL.GlobalConditional.ContainsKey(Line[1..]))
+                        {
+							SBL.GlobalConditional.Add(Line[1..], false);
+                        }
                     }
 					return true;
 
@@ -311,7 +357,7 @@ namespace StoryBlocks
 					}
                     else
                     {
-						SBFH.LoadBlock(Elements[0]);
+						SBFH.LoadBlock(Elements[0], flag);
                     }
 					return true;
 
@@ -440,10 +486,15 @@ namespace StoryBlocks
         {
 			foreach(var item in SBL.GlobalConditional)
             {
-                if (!item.Value && PrefixOperation(item.Key.Substring(1)))
+                if (!item.Value && PrefixOperation(item.Key, false))
                 {
-                    SBL.GlobalConditional[item.Key] = true;
-					PrefixOperation(item.Key.Substring(1));
+					SBL.GlobalConditional[item.Key] = true;
+					Console.Clear();
+					PrefixOperation(SBPH.GetNextPrefix(item.Key), false);
+                }
+				if(item.Value && !PrefixOperation(item.Key))
+                {
+					SBL.GlobalConditional[item.Key] = false;
                 }
             }
         }

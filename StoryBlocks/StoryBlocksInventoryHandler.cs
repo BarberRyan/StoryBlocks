@@ -60,7 +60,7 @@ namespace StoryBlocks
         {
 			if (SBL.Inventory.Count() > 0)
 			{
-				SBBoxBuilder.DrawBox(menu: SBL.Inventory, title: "INVENTORY", yCoord: 15, bkgColor: "dark grey");
+				SBBoxBuilder.DrawBox(menu: SBL.Inventory, title: "INVENTORY", yCoord: 15);
 			}
 		}
 	}

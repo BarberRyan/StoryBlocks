@@ -106,11 +106,11 @@ namespace StoryBlocks
         {
             if (!line.Contains(@"\:"))
             {
-			return line[..(line.IndexOf(':') + 1)];
+				return line[..(line.IndexOf(':') + 1)];
             }
             else
             {
-				return "";
+                return "";
             }
         }
 

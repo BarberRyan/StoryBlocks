@@ -34,7 +34,7 @@ namespace StoryBlocks
             SBFH.CreateBlocks(story);
             SBFH.LoadConfig();
             Console.Title = $"StoryBlocks: {SBFH.title}";
-            SBM.CreateMenu("MAIN MENU");
+            SBM.CreateMenu("MAIN MENU", false);
         }
     }
 }

@@ -39,6 +39,16 @@ namespace StoryBlocks
             }
             else
             {
+                if (Menu.ContainsKey("INVENTORY"))
+                {
+					if (!Menu.ContainsKey(command))
+                    {
+						Menu.Remove("INVENTORY");
+						Menu.Add(command, text);
+						Menu.Add("INVENTORY", "-Inventory-");
+                    }
+                }
+
                 if (!Menu.ContainsKey(command))
                 {
 				Menu.Add(command, text);
@@ -87,7 +97,7 @@ namespace StoryBlocks
 				}
             }
 
-			string menuCommand = RunMenu();
+			string menuCommand = RunMenu(flag);
 
 			//Block load command that exits the app.
 			if (menuCommand == "EXIT")
@@ -209,7 +219,7 @@ namespace StoryBlocks
 				AddMenuElement("RELOAD", "Reload the story list");
 				AddMenuElement("EXIT", "Exit the program");
 				
-				string storyName = RunMenu();
+				string storyName = RunMenu(false);
 				
 				if(storyName == "EXIT")
                 {
@@ -322,13 +332,16 @@ namespace StoryBlocks
 				SBInventoryHandler.DrawInventory();
 			}
 		}
-		
+
 
 		//handles keyboard input for choice selection, and escape to exit the program.
 		//To Do: Move to event handler class, add more input options.
-		public static string RunMenu()
+		public static string RunMenu(bool flag = true)
         {
-			SBEH.CheckGlobalConditionals();
+            if (flag)
+            {
+				SBEH.CheckGlobalConditionals();
+            }
 			activeOption = 1;
 			ConsoleKey pressedKey;
 			do
@@ -383,7 +396,7 @@ namespace StoryBlocks
                     }
                     else
                     {
-						SBFH.LoadBlock("MAIN MENU");
+						SBFH.LoadBlock("MAIN MENU",false);
                     }
                 }
 			} while (pressedKey != ConsoleKey.Enter);
